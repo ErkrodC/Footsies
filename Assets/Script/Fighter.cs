@@ -1,40 +1,31 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Footsies {
 	public class BoxBase {
-		public Rect rect;
+		public Rect Rect;
 
-		public float xMin {
-			get { return rect.x - rect.width / 2; }
-		}
+		public float XMin => Rect.x - Rect.width / 2;
 
-		public float xMax {
-			get { return rect.x + rect.width / 2; }
-		}
+		public float XMax => Rect.x + Rect.width / 2;
 
-		public float yMin {
-			get { return rect.y; }
-		}
+		public float YMin => Rect.y;
 
-		public float yMax {
-			get { return rect.y + rect.height; }
-		}
+		public float YMax => Rect.y + Rect.height;
 
 		public bool Overlaps(BoxBase otherBox) {
-			var c1 = otherBox.xMax >= xMin;
-			var c2 = otherBox.xMin <= xMax;
-			var c3 = otherBox.yMax >= yMin;
-			var c4 = otherBox.yMin <= yMax;
+			bool c1 = otherBox.XMax >= XMin;
+			bool c2 = otherBox.XMin <= XMax;
+			bool c3 = otherBox.YMax >= YMin;
+			bool c4 = otherBox.YMin <= YMax;
 
 			return c1 && c2 && c3 && c4;
 		}
 	}
 
 	public class Hitbox : BoxBase {
-		public bool proximity = false;
-		public int attackID;
+		public bool Proximity = false;
+		public int AttackID;
 	}
 
 	public class Hurtbox : BoxBase { }
@@ -42,23 +33,23 @@ namespace Footsies {
 	public class Pushbox : BoxBase { }
 
 	public enum CommonActionID {
-		STAND = 0,
-		FORWARD = 1,
-		BACKWARD = 2,
-		DASH_FORWARD = 10,
-		DASH_BACKWARD = 11,
-		N_ATTACK = 100,
-		B_ATTACK = 105,
-		N_SPECIAL = 110,
-		B_SPECIAL = 115,
-		DAMAGE = 200,
-		GUARD_M = 301,
-		GUARD_STAND = 305,
-		GUARD_CROUCH = 306,
-		GUARD_BREAK = 310,
-		GUARD_PROXIMITY = 350,
-		DEAD = 500,
-		WIN = 510,
+		Stand = 0,
+		Forward = 1,
+		Backward = 2,
+		DashForward = 10,
+		DashBackward = 11,
+		NAttack = 100,
+		BAttack = 105,
+		NSpecial = 110,
+		BSpecial = 115,
+		Damage = 200,
+		GuardM = 301,
+		GuardStand = 305,
+		GuardCrouch = 306,
+		GuardBreak = 310,
+		GuardProximity = 350,
+		Dead = 500,
+		Win = 510,
 	}
 
 	public enum DamageResult {
@@ -69,45 +60,35 @@ namespace Footsies {
 	}
 
 	public class Fighter {
-		public Vector2 position;
-		public float velocity_x;
-		public bool isFaceRight;
+		public Vector2 Position;
+		public float VelocityX;
+		public bool IsFaceRight;
 
-		public List<Hitbox> hitboxes = new List<Hitbox>();
-		public List<Hurtbox> hurtboxes = new List<Hurtbox>();
-		public Pushbox pushbox;
+		public List<Hitbox> Hitboxes = new List<Hitbox>();
+		public List<Hurtbox> Hurtboxes = new List<Hurtbox>();
+		public Pushbox Pushbox;
 
 		private FighterData fighterData;
 
-		public bool isDead {
-			get { return vitalHealth <= 0; }
-		}
+		public bool IsDead => VitalHealth <= 0;
 
-		public int vitalHealth { get; private set; }
-		public int guardHealth { get; private set; }
+		public int VitalHealth { get; private set; }
+		public int GuardHealth { get; private set; }
 
-		public int currentActionID { get; private set; }
-		public int currentActionFrame { get; private set; }
+		public int CurrentActionID { get; private set; }
+		public int CurrentActionFrame { get; private set; }
 
-		public int currentActionFrameCount {
-			get { return fighterData.actions[currentActionID].frameCount; }
-		}
+		public int CurrentActionFrameCount => fighterData.Actions[CurrentActionID].frameCount;
 
-		private bool isActionEnd {
-			get { return (currentActionFrame >= fighterData.actions[currentActionID].frameCount); }
-		}
+		private bool IsActionEnd => CurrentActionFrame >= fighterData.Actions[CurrentActionID].frameCount;
 
-		public bool isAlwaysCancelable {
-			get { return fighterData.actions[currentActionID].alwaysCancelable; }
-		}
+		public bool IsAlwaysCancellable => fighterData.Actions[CurrentActionID].alwaysCancelable;
 
-		public int currentActionHitCount { get; private set; }
+		public int CurrentActionHitCount { get; private set; }
 
-		public int currentHitStunFrame { get; private set; }
+		public int CurrentHitStunFrame { get; private set; }
 
-		public bool isInHitStun {
-			get { return currentHitStunFrame > 0; }
-		}
+		public bool IsInHitStun => CurrentHitStunFrame > 0;
 
 		private static int inputRecordFrame = 180;
 		private int[] input = new int[inputRecordFrame];
@@ -120,7 +101,7 @@ namespace Footsies {
 		private int bufferActionID = -1;
 		private int reserveDamageActionID = -1;
 
-		public int spriteShakePosition { get; private set; }
+		public int SpriteShakePosition { get; private set; }
 		private int maxSpriteShakeFrame = 6;
 
 		private bool hasWon = false;
@@ -133,18 +114,18 @@ namespace Footsies {
 		/// <param name="isPlayerOne"></param>
 		public void SetupBattleStart(FighterData fighterData, Vector2 startPosition, bool isPlayerOne) {
 			this.fighterData = fighterData;
-			position = startPosition;
-			isFaceRight = isPlayerOne;
+			Position = startPosition;
+			IsFaceRight = isPlayerOne;
 
-			vitalHealth = 1;
-			guardHealth = fighterData.startGuardHealth;
+			VitalHealth = 1;
+			GuardHealth = fighterData.startGuardHealth;
 			hasWon = false;
 
-			velocity_x = 0;
+			VelocityX = 0;
 
 			ClearInput();
 
-			SetCurrentAction((int) CommonActionID.STAND);
+			SetCurrentAction((int) CommonActionID.Stand);
 		}
 
 		/// <summary>
@@ -152,23 +133,23 @@ namespace Footsies {
 		/// </summary>
 		public void IncrementActionFrame() {
 			// Decrease sprite shake count and swap +/- (used by BattleGUI for fighter sprite position)
-			if (Mathf.Abs(spriteShakePosition) > 0) {
-				spriteShakePosition *= -1;
-				spriteShakePosition += (spriteShakePosition > 0 ? -1 : 1);
+			if (Mathf.Abs(SpriteShakePosition) > 0) {
+				SpriteShakePosition *= -1;
+				SpriteShakePosition += SpriteShakePosition > 0 ? -1 : 1;
 			}
 
 			// If fighter is in hit stun then the action frame stay the same
-			if (currentHitStunFrame > 0) {
-				currentHitStunFrame--;
+			if (CurrentHitStunFrame > 0) {
+				CurrentHitStunFrame--;
 				return;
 			}
 
-			currentActionFrame++;
+			CurrentActionFrame++;
 
 			// For loop motion (winning pose etc.) set action frame back to loop start frame
-			if (isActionEnd) {
-				if (fighterData.actions[currentActionID].isLoop) {
-					currentActionFrame = fighterData.actions[currentActionID].loopFromFrame;
+			if (IsActionEnd) {
+				if (fighterData.Actions[CurrentActionID].isLoop) {
+					CurrentActionFrame = fighterData.Actions[CurrentActionID].loopFromFrame;
 				}
 			}
 		}
@@ -186,7 +167,7 @@ namespace Footsies {
 			}
 
 			// Insert new input data
-			input[0] = inputData.input;
+			input[0] = inputData.Input;
 			inputDown[0] = (input[0] ^ input[1]) & input[0];
 			inputUp[0] = (input[0] ^ input[1]) & ~input[0];
 			//Debug.Log(System.Convert.ToString(input[0], 2) + " " + System.Convert.ToString(inputDown[0], 2) + " " + System.Convert.ToString(inputUp[0], 2));
@@ -196,7 +177,7 @@ namespace Footsies {
 		/// Action request for intro state ()
 		/// </summary>
 		public void UpdateIntroAction() {
-			RequestAction((int) CommonActionID.STAND);
+			RequestAction((int) CommonActionID.Stand);
 		}
 
 		/// <summary>
@@ -205,14 +186,14 @@ namespace Footsies {
 		public void UpdateActionRequest() {
 			// If won then just request win animation
 			if (hasWon) {
-				RequestAction((int) CommonActionID.WIN);
+				RequestAction((int) CommonActionID.Win);
 				return;
 			}
 
 			// If there is any reserve damage action, set that to current action
 			// Use for playing damage motion after hit stun ended (only use this for guard break currently)
 			if (reserveDamageActionID != -1
-			    && currentHitStunFrame <= 0) {
+			    && CurrentHitStunFrame <= 0) {
 				SetCurrentAction(reserveDamageActionID);
 				reserveDamageActionID = -1;
 				return;
@@ -221,54 +202,58 @@ namespace Footsies {
 			// If there is any buffer action, set that to current action
 			// Use for canceling normal to special attack
 			if (bufferActionID != -1
-			    && canCancelAttack()
-			    && currentHitStunFrame <= 0) {
+			    && CanCancelAttack()
+			    && CurrentHitStunFrame <= 0) {
 				SetCurrentAction(bufferActionID);
 				bufferActionID = -1;
 				return;
 			}
 
-			var isForward = IsForwardInput(input[0]);
-			var isBackward = IsBackwardInput(input[0]);
+			bool isForward = IsForwardInput(input[0]);
+			bool isBackward = IsBackwardInput(input[0]);
 			bool isAttack = IsAttackInput(inputDown[0]);
 			if (CheckSpecialAttackInput()) {
-				if (isBackward || isForward)
-					RequestAction((int) CommonActionID.B_SPECIAL);
-				else
-					RequestAction((int) CommonActionID.N_SPECIAL);
+				if (isBackward || isForward) {
+					RequestAction((int) CommonActionID.BSpecial);
+				} else {
+					RequestAction((int) CommonActionID.NSpecial);
+				}
 			} else if (isAttack) {
-				if ((currentActionID == (int) CommonActionID.N_ATTACK ||
-				     currentActionID == (int) CommonActionID.B_ATTACK) &&
-				    !isActionEnd)
-					RequestAction((int) CommonActionID.N_SPECIAL);
-				else {
-					if (isBackward || isForward)
-						RequestAction((int) CommonActionID.B_ATTACK);
-					else
-						RequestAction((int) CommonActionID.N_ATTACK);
+				if ((CurrentActionID == (int) CommonActionID.NAttack ||
+				     CurrentActionID == (int) CommonActionID.BAttack) &&
+				    !IsActionEnd) {
+					RequestAction((int) CommonActionID.NSpecial);
+				} else {
+					if (isBackward || isForward) {
+						RequestAction((int) CommonActionID.BAttack);
+					} else {
+						RequestAction((int) CommonActionID.NAttack);
+					}
 				}
 			}
 
-			if (CheckForwardDashInput())
-				RequestAction((int) CommonActionID.DASH_FORWARD);
-			else if (CheckBackwardDashInput())
-				RequestAction((int) CommonActionID.DASH_BACKWARD);
+			if (CheckForwardDashInput()) {
+				RequestAction((int) CommonActionID.DashForward);
+			} else if (CheckBackwardDashInput()) {
+				RequestAction((int) CommonActionID.DashBackward);
+			}
 
 
 			// for proximity guard check
 			isInputBackward = isBackward;
 
 			if (isForward && isBackward) {
-				RequestAction((int) CommonActionID.STAND);
+				RequestAction((int) CommonActionID.Stand);
 			} else if (isForward) {
-				RequestAction((int) CommonActionID.FORWARD);
+				RequestAction((int) CommonActionID.Forward);
 			} else if (isBackward) {
-				if (isReserveProximityGuard)
-					RequestAction((int) CommonActionID.GUARD_PROXIMITY);
-				else
-					RequestAction((int) CommonActionID.BACKWARD);
+				if (isReserveProximityGuard) {
+					RequestAction((int) CommonActionID.GuardProximity);
+				} else {
+					RequestAction((int) CommonActionID.Backward);
+				}
 			} else {
-				RequestAction((int) CommonActionID.STAND);
+				RequestAction((int) CommonActionID.Stand);
 			}
 
 			isReserveProximityGuard = false;
@@ -278,25 +263,26 @@ namespace Footsies {
 		/// Update character position
 		/// </summary>
 		public void UpdateMovement() {
-			if (isInHitStun)
+			if (IsInHitStun) {
 				return;
+			}
 
 			// Position changes from walking forward and backward
-			var sign = isFaceRight ? 1 : -1;
-			if (currentActionID == (int) CommonActionID.FORWARD) {
-				position.x += fighterData.forwardMoveSpeed * sign * Time.deltaTime;
+			int sign = IsFaceRight ? 1 : -1;
+			if (CurrentActionID == (int) CommonActionID.Forward) {
+				Position.x += fighterData.forwardMoveSpeed * sign * Time.deltaTime;
 				return;
-			} else if (currentActionID == (int) CommonActionID.BACKWARD) {
-				position.x -= fighterData.backwardMoveSpeed * sign * Time.deltaTime;
+			} else if (CurrentActionID == (int) CommonActionID.Backward) {
+				Position.x -= fighterData.backwardMoveSpeed * sign * Time.deltaTime;
 				return;
 			}
 
 			// Position changes from action data
-			var movementData = fighterData.actions[currentActionID].GetMovementData(currentActionFrame);
+			MovementData movementData = fighterData.Actions[CurrentActionID].GetMovementData(CurrentActionFrame);
 			if (movementData != null) {
-				velocity_x = movementData.velocity_x;
-				if (velocity_x != 0) {
-					position.x += velocity_x * sign * Time.deltaTime;
+				VelocityX = movementData.velocity_x;
+				if (VelocityX != 0) {
+					Position.x += VelocityX * sign * Time.deltaTime;
 				}
 			}
 		}
@@ -311,46 +297,46 @@ namespace Footsies {
 		/// <param name="x"></param>
 		/// <param name="y"></param>
 		public void ApplyPositionChange(float x, float y) {
-			position.x += x;
-			position.y += y;
+			Position.x += x;
+			Position.y += y;
 
-			foreach (var hitbox in hitboxes) {
-				hitbox.rect.x += x;
-				hitbox.rect.y += y;
+			foreach (Hitbox hitbox in Hitboxes) {
+				hitbox.Rect.x += x;
+				hitbox.Rect.y += y;
 			}
 
-			foreach (var hurtbox in hurtboxes) {
-				hurtbox.rect.x += x;
-				hurtbox.rect.y += y;
+			foreach (Hurtbox hurtbox in Hurtboxes) {
+				hurtbox.Rect.x += x;
+				hurtbox.Rect.y += y;
 			}
 
-			pushbox.rect.x += x;
-			pushbox.rect.y += y;
+			Pushbox.Rect.x += x;
+			Pushbox.Rect.y += y;
 		}
 
 		public void NotifyAttackHit(Fighter damagedFighter, Vector2 damagePos) {
-			currentActionHitCount++;
+			CurrentActionHitCount++;
 		}
 
 		public DamageResult NotifyDamaged(AttackData attackData, Vector2 damagePos) {
 			bool isGuardBreak = false;
 			if (attackData.guardHealthDamage > 0) {
-				guardHealth -= attackData.guardHealthDamage;
-				if (guardHealth < 0) {
+				GuardHealth -= attackData.guardHealthDamage;
+				if (GuardHealth < 0) {
 					isGuardBreak = true;
-					guardHealth = 0;
+					GuardHealth = 0;
 				}
 			}
 
-			if (currentActionID == (int) CommonActionID.BACKWARD
-			    || fighterData.actions[currentActionID].Type == ActionType.Guard
+			if (CurrentActionID == (int) CommonActionID.Backward
+			    || fighterData.Actions[CurrentActionID].Type == ActionType.Guard
 			) // if in blocking motion, automatically block next attack
 			{
 				if (isGuardBreak) {
 					SetCurrentAction(attackData.guardActionID);
-					reserveDamageActionID = (int) CommonActionID.GUARD_BREAK;
-					SoundManager.Instance.playFighterSE(fighterData.actions[reserveDamageActionID].audioClip,
-						isFaceRight, position.x);
+					reserveDamageActionID = (int) CommonActionID.GuardBreak;
+					SoundManager.Instance.PlayFighterSE(fighterData.Actions[reserveDamageActionID].audioClip,
+						IsFaceRight, Position.x);
 					return DamageResult.GuardBreak;
 				} else {
 					SetCurrentAction(attackData.guardActionID);
@@ -358,9 +344,10 @@ namespace Footsies {
 				}
 			} else {
 				if (attackData.vitalHealthDamage > 0) {
-					vitalHealth -= attackData.vitalHealthDamage;
-					if (vitalHealth <= 0)
-						vitalHealth = 0;
+					VitalHealth -= attackData.vitalHealthDamage;
+					if (VitalHealth <= 0) {
+						VitalHealth = 0;
+					}
 				}
 
 				SetCurrentAction(attackData.damageActionID);
@@ -375,48 +362,51 @@ namespace Footsies {
 		}
 
 		public bool CanAttackHit(int attackID) {
-			if (!fighterData.attackData.ContainsKey(attackID)) {
+			if (!fighterData.AttackData.ContainsKey(attackID)) {
 				Debug.LogWarning("Attack hit but AttackID=" + attackID + " is not registered");
 				return true;
 			}
 
-			if (currentActionHitCount >= fighterData.attackData[attackID].numberOfHit)
+			if (CurrentActionHitCount >= fighterData.AttackData[attackID].numberOfHit) {
 				return false;
+			}
 
 			return true;
 		}
 
-		public AttackData getAttackData(int attackID) {
-			if (!fighterData.attackData.ContainsKey(attackID)) {
+		public AttackData GetAttackData(int attackID) {
+			if (!fighterData.AttackData.ContainsKey(attackID)) {
 				Debug.LogWarning("Attack hit but AttackID=" + attackID + " is not registered");
 				return null;
 			}
 
-			return fighterData.attackData[attackID];
+			return fighterData.AttackData[attackID];
 		}
 
 		public void SetHitStun(int hitStunFrame) {
-			currentHitStunFrame = hitStunFrame;
+			CurrentHitStunFrame = hitStunFrame;
 		}
 
 		public void SetSpriteShakeFrame(int spriteShakeFrame) {
-			if (spriteShakeFrame > maxSpriteShakeFrame)
+			if (spriteShakeFrame > maxSpriteShakeFrame) {
 				spriteShakeFrame = maxSpriteShakeFrame;
+			}
 
-			spriteShakePosition = spriteShakeFrame * (isFaceRight ? -1 : 1);
+			SpriteShakePosition = spriteShakeFrame * (IsFaceRight ? -1 : 1);
 		}
 
 		public int GetHitStunFrame(DamageResult damageResult, int attackID) {
-			if (damageResult == DamageResult.Guard)
-				return fighterData.attackData[attackID].guardStunFrame;
-			else if (damageResult == DamageResult.GuardBreak)
-				return fighterData.attackData[attackID].guardBreakStunFrame;
+			if (damageResult == DamageResult.Guard) {
+				return fighterData.AttackData[attackID].guardStunFrame;
+			} else if (damageResult == DamageResult.GuardBreak) {
+				return fighterData.AttackData[attackID].guardBreakStunFrame;
+			}
 
-			return fighterData.attackData[attackID].hitStunFrame;
+			return fighterData.AttackData[attackID].hitStunFrame;
 		}
 
-		public int getGuardStunFrame(int attackID) {
-			return fighterData.attackData[attackID].guardStunFrame;
+		public int GetGuardStunFrame(int attackID) {
+			return fighterData.AttackData[attackID].guardStunFrame;
 		}
 
 		public void RequestWinAction() {
@@ -430,20 +420,21 @@ namespace Footsies {
 		/// <param name="startFrame"></param>
 		/// <returns></returns>
 		public bool RequestAction(int actionID, int startFrame = 0) {
-			if (isActionEnd) {
+			if (IsActionEnd) {
 				SetCurrentAction(actionID, startFrame);
 				return true;
 			}
 
-			if (currentActionID == actionID) {
+			if (CurrentActionID == actionID) {
 				return false;
 			}
 
-			if (fighterData.actions[currentActionID].alwaysCancelable) {
+			if (fighterData.Actions[CurrentActionID].alwaysCancelable) {
 				SetCurrentAction(actionID, startFrame);
 				return true;
 			} else {
-				foreach (var cancelData in fighterData.actions[currentActionID].GetCancelData(currentActionFrame)) {
+				foreach (CancelData cancelData in fighterData.Actions[CurrentActionID].GetCancelData(CurrentActionFrame)
+				) {
 					if (cancelData.actionID.Contains(actionID)) {
 						if (cancelData.execute) {
 							bufferActionID = actionID;
@@ -459,11 +450,12 @@ namespace Footsies {
 		}
 
 		public Sprite GetCurrentMotionSprite() {
-			var motionData = fighterData.actions[currentActionID].GetMotionData(currentActionFrame);
-			if (motionData == null)
+			MotionFrameData motionData = fighterData.Actions[CurrentActionID].GetMotionData(CurrentActionFrame);
+			if (motionData == null) {
 				return null;
+			}
 
-			return fighterData.motionData[motionData.motionID].sprite;
+			return fighterData.MotionData[motionData.motionID].sprite;
 		}
 
 		public void ClearInput() {
@@ -474,11 +466,12 @@ namespace Footsies {
 			}
 		}
 
-		private bool canCancelAttack() {
-			if (fighterData.canCancelOnWhiff)
+		private bool CanCancelAttack() {
+			if (fighterData.canCancelOnWhiff) {
 				return true;
-			else if (currentActionHitCount > 0)
+			} else if (CurrentActionHitCount > 0) {
 				return true;
+			}
 
 			return false;
 		}
@@ -489,20 +482,21 @@ namespace Footsies {
 		/// <param name="actionID"></param>
 		/// <param name="startFrame"></param>
 		private void SetCurrentAction(int actionID, int startFrame = 0) {
-			currentActionID = actionID;
-			currentActionFrame = startFrame;
+			CurrentActionID = actionID;
+			CurrentActionFrame = startFrame;
 
-			currentActionHitCount = 0;
+			CurrentActionHitCount = 0;
 			bufferActionID = -1;
 			reserveDamageActionID = -1;
-			spriteShakePosition = 0;
+			SpriteShakePosition = 0;
 
-			if (fighterData.actions[currentActionID].audioClip != null) {
-				if (currentActionID == (int) CommonActionID.GUARD_BREAK)
+			if (fighterData.Actions[CurrentActionID].audioClip != null) {
+				if (CurrentActionID == (int) CommonActionID.GuardBreak) {
 					return;
+				}
 
-				SoundManager.Instance.playFighterSE(fighterData.actions[currentActionID].audioClip, isFaceRight,
-					position.x);
+				SoundManager.Instance.PlayFighterSE(fighterData.Actions[CurrentActionID].audioClip, IsFaceRight,
+					Position.x);
 			}
 		}
 
@@ -511,8 +505,9 @@ namespace Footsies {
 		/// </summary>
 		/// <returns></returns>
 		private bool CheckSpecialAttackInput() {
-			if (!IsAttackInput(inputUp[0]))
+			if (!IsAttackInput(inputUp[0])) {
 				return false;
+			}
 
 			for (int i = 1; i < fighterData.specialAttackHoldFrame; i++) {
 				if (!IsAttackInput(input[i])) {
@@ -524,8 +519,9 @@ namespace Footsies {
 		}
 
 		private bool CheckForwardDashInput() {
-			if (!IsForwardInput(inputDown[0]))
+			if (!IsForwardInput(inputDown[0])) {
 				return false;
+			}
 
 			for (int i = 1; i < fighterData.dashAllowFrame; i++) {
 				if (IsBackwardInput(input[i])) {
@@ -534,8 +530,9 @@ namespace Footsies {
 
 				if (IsForwardInput(input[i])) {
 					for (int j = i + 1; j < i + fighterData.dashAllowFrame; j++) {
-						if (!IsForwardInput(input[j]) && !IsBackwardInput(input[j]))
+						if (!IsForwardInput(input[j]) && !IsBackwardInput(input[j])) {
 							return true;
+						}
 					}
 
 					return false;
@@ -546,8 +543,9 @@ namespace Footsies {
 		}
 
 		private bool CheckBackwardDashInput() {
-			if (!IsBackwardInput(inputDown[0]))
+			if (!IsBackwardInput(inputDown[0])) {
 				return false;
+			}
 
 			for (int i = 1; i < fighterData.dashAllowFrame; i++) {
 				if (IsForwardInput(input[i])) {
@@ -556,8 +554,9 @@ namespace Footsies {
 
 				if (IsBackwardInput(input[i])) {
 					for (int j = i + 1; j < i + fighterData.dashAllowFrame; j++) {
-						if (!IsForwardInput(input[j]) && !IsBackwardInput(input[j]))
+						if (!IsForwardInput(input[j]) && !IsBackwardInput(input[j])) {
 							return true;
+						}
 					}
 
 					return false;
@@ -572,7 +571,7 @@ namespace Footsies {
 		}
 
 		private bool IsForwardInput(int input) {
-			if (isFaceRight) {
+			if (IsFaceRight) {
 				return (input & (int) InputDefine.Right) > 0;
 			} else {
 				return (input & (int) InputDefine.Left) > 0;
@@ -580,7 +579,7 @@ namespace Footsies {
 		}
 
 		private bool IsBackwardInput(int input) {
-			if (isFaceRight) {
+			if (IsFaceRight) {
 				return (input & (int) InputDefine.Left) > 0;
 			} else {
 				return (input & (int) InputDefine.Right) > 0;
@@ -591,28 +590,28 @@ namespace Footsies {
 		/// Copy data from current action and convert relative box position with fighter position
 		/// </summary>
 		private void ApplyCurrentActionData() {
-			hitboxes.Clear();
-			hurtboxes.Clear();
+			Hitboxes.Clear();
+			Hurtboxes.Clear();
 
-			foreach (var hitbox in fighterData.actions[currentActionID].GetHitboxData(currentActionFrame)) {
-				var box = new Hitbox();
-				box.rect = TransformToFightRect(hitbox.rect, position, isFaceRight);
-				box.proximity = hitbox.proximity;
-				box.attackID = hitbox.attackID;
-				hitboxes.Add(box);
+			foreach (HitboxData hitbox in fighterData.Actions[CurrentActionID].GetHitboxData(CurrentActionFrame)) {
+				Hitbox box = new Hitbox();
+				box.Rect = TransformToFightRect(hitbox.rect, Position, IsFaceRight);
+				box.Proximity = hitbox.proximity;
+				box.AttackID = hitbox.attackID;
+				Hitboxes.Add(box);
 			}
 
-			foreach (var hurtbox in fighterData.actions[currentActionID].GetHurtboxData(currentActionFrame)) {
-				var box = new Hurtbox();
+			foreach (HurtboxData hurtbox in fighterData.Actions[CurrentActionID].GetHurtboxData(CurrentActionFrame)) {
+				Hurtbox box = new Hurtbox();
 				Rect rect = hurtbox.useBaseRect ? fighterData.baseHurtBoxRect : hurtbox.rect;
-				box.rect = TransformToFightRect(rect, position, isFaceRight);
-				hurtboxes.Add(box);
+				box.Rect = TransformToFightRect(rect, Position, IsFaceRight);
+				Hurtboxes.Add(box);
 			}
 
-			var pushBoxData = fighterData.actions[currentActionID].GetPushboxData(currentActionFrame);
-			pushbox = new Pushbox();
+			PushboxData pushBoxData = fighterData.Actions[CurrentActionID].GetPushboxData(CurrentActionFrame);
+			Pushbox = new Pushbox();
 			Rect pushRect = pushBoxData.useBaseRect ? fighterData.basePushBoxRect : pushBoxData.rect;
-			pushbox.rect = TransformToFightRect(pushRect, position, isFaceRight);
+			Pushbox.Rect = TransformToFightRect(pushRect, Position, IsFaceRight);
 		}
 
 		/// <summary>
@@ -623,10 +622,10 @@ namespace Footsies {
 		/// <param name="isFaceRight"></param>
 		/// <returns></returns>
 		private Rect TransformToFightRect(Rect dataRect, Vector2 basePosition, bool isFaceRight) {
-			var sign = isFaceRight ? 1 : -1;
+			int sign = isFaceRight ? 1 : -1;
 
-			var fightPosRect = new Rect();
-			fightPosRect.x = basePosition.x + (dataRect.x * sign);
+			Rect fightPosRect = new Rect();
+			fightPosRect.x = basePosition.x + dataRect.x * sign;
 			fightPosRect.y = basePosition.y + dataRect.y;
 			fightPosRect.width = dataRect.width;
 			fightPosRect.height = dataRect.height;

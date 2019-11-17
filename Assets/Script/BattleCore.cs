@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
+
+#pragma warning disable 649
 
 namespace Footsies {
 	/// <summary>
@@ -19,15 +19,11 @@ namespace Footsies {
 
 		[SerializeField] private float _battleAreaWidth = 10f;
 
-		public float battleAreaWidth {
-			get { return _battleAreaWidth; }
-		}
+		public float BattleAreaWidth => _battleAreaWidth;
 
 		[SerializeField] private float _battleAreaMaxHeight = 2f;
 
-		public float battleAreaMaxHeight {
-			get { return _battleAreaMaxHeight; }
-		}
+		public float BattleAreaMaxHeight => _battleAreaMaxHeight;
 
 		[SerializeField] private GameObject roundUI;
 
@@ -43,26 +39,22 @@ namespace Footsies {
 		private float timer = 0;
 		private uint maxRoundWon = 3;
 
-		public Fighter fighter1 { get; private set; }
-		public Fighter fighter2 { get; private set; }
+		public Fighter Fighter1 { get; private set; }
+		public Fighter Fighter2 { get; private set; }
 
-		public uint fighter1RoundWon { get; private set; }
-		public uint fighter2RoundWon { get; private set; }
+		public uint Fighter1RoundWon { get; private set; }
+		public uint Fighter2RoundWon { get; private set; }
 
-		public List<Fighter> fighters {
-			get { return _fighters; }
-		}
+		public List<Fighter> Fighters => fighters;
 
-		private List<Fighter> _fighters = new List<Fighter>();
+		private List<Fighter> fighters = new List<Fighter>();
 
 		private float roundStartTime;
 		private int frameCount;
 
-		public RoundStateType roundState {
-			get { return _roundState; }
-		}
+		public RoundStateType RoundState => roundState;
 
-		private RoundStateType _roundState = RoundStateType.Stop;
+		private RoundStateType roundState = RoundStateType.Stop;
 
 		public System.Action<Fighter, Vector2, DamageResult> damageHandler;
 
@@ -81,30 +73,30 @@ namespace Footsies {
 		private uint lastRoundMaxRecordingInput = 0;
 		private bool isReplayingLastRoundInput = false;
 
-		public bool isDebugPause { get; private set; }
+		public bool IsDebugPause { get; private set; }
 
 		private float introStateTime = 3f;
 		private float koStateTime = 2f;
 		private float endStateTime = 3f;
 		private float endStateSkippableTime = 1.5f;
 
-		void Awake() {
+		private void Awake() {
 			// Setup dictionary from ScriptableObject data
-			fighterDataList.ForEach((data) => data.setupDictionary());
+			fighterDataList.ForEach((data) => data.SetupDictionary());
 
-			fighter1 = new Fighter();
-			fighter2 = new Fighter();
+			Fighter1 = new Fighter();
+			Fighter2 = new Fighter();
 
-			_fighters.Add(fighter1);
-			_fighters.Add(fighter2);
+			fighters.Add(Fighter1);
+			fighters.Add(Fighter2);
 
 			if (roundUI != null) {
 				roundUIAnimator = roundUI.GetComponent<Animator>();
 			}
 		}
 
-		void FixedUpdate() {
-			switch (_roundState) {
+		private void FixedUpdate() {
+			switch (roundState) {
 				case RoundStateType.Stop:
 
 					ChangeRoundState(RoundStateType.Intro);
@@ -135,7 +127,7 @@ namespace Footsies {
 
 					UpdateFightState();
 
-					var deadFighter = _fighters.Find((f) => f.isDead);
+					Fighter deadFighter = fighters.Find((f) => f.IsDead);
 					if (deadFighter != null) {
 						ChangeRoundState(RoundStateType.KO);
 					}
@@ -155,7 +147,7 @@ namespace Footsies {
 					UpdateEndState();
 					timer -= Time.deltaTime;
 					if (timer <= 0f
-					    || (timer <= endStateSkippableTime && IsKOSkipButtonPressed())) {
+					    || timer <= endStateSkippableTime && IsKOSkipButtonPressed()) {
 						ChangeRoundState(RoundStateType.Stop);
 					}
 
@@ -163,28 +155,29 @@ namespace Footsies {
 			}
 		}
 
-		void ChangeRoundState(RoundStateType state) {
-			_roundState = state;
-			switch (_roundState) {
+		private void ChangeRoundState(RoundStateType state) {
+			roundState = state;
+			switch (roundState) {
 				case RoundStateType.Stop:
 
-					if (fighter1RoundWon >= maxRoundWon
-					    || fighter2RoundWon >= maxRoundWon) {
+					if (Fighter1RoundWon >= maxRoundWon
+					    || Fighter2RoundWon >= maxRoundWon) {
 						GameManager.Instance.LoadTitleScene();
 					}
 
 					break;
 				case RoundStateType.Intro:
 
-					fighter1.SetupBattleStart(fighterDataList[0], new Vector2(-2f, 0f), true);
-					fighter2.SetupBattleStart(fighterDataList[0], new Vector2(2f, 0f), false);
+					Fighter1.SetupBattleStart(fighterDataList[0], new Vector2(-2f, 0f), true);
+					Fighter2.SetupBattleStart(fighterDataList[0], new Vector2(2f, 0f), false);
 
 					timer = introStateTime;
 
 					roundUIAnimator.SetTrigger("RoundStart");
 
-					if (GameManager.Instance.isVsCPU)
+					if (GameManager.Instance.IsVsCPU) {
 						battleAI = new BattleAI(this);
+					}
 
 					break;
 				case RoundStateType.Fight:
@@ -201,8 +194,8 @@ namespace Footsies {
 
 					CopyLastRoundInput();
 
-					fighter1.ClearInput();
-					fighter2.ClearInput();
+					Fighter1.ClearInput();
+					Fighter2.ClearInput();
 
 					battleAI = null;
 
@@ -213,14 +206,14 @@ namespace Footsies {
 
 					timer = endStateTime;
 
-					var deadFighter = _fighters.FindAll((f) => f.isDead);
+					List<Fighter> deadFighter = fighters.FindAll((f) => f.IsDead);
 					if (deadFighter.Count == 1) {
-						if (deadFighter[0] == fighter1) {
-							fighter2RoundWon++;
-							fighter2.RequestWinAction();
-						} else if (deadFighter[0] == fighter2) {
-							fighter1RoundWon++;
-							fighter1.RequestWinAction();
+						if (deadFighter[0] == Fighter1) {
+							Fighter2RoundWon++;
+							Fighter2.RequestWinAction();
+						} else if (deadFighter[0] == Fighter2) {
+							Fighter1RoundWon++;
+							Fighter1.RequestWinAction();
 						}
 					}
 
@@ -228,178 +221,187 @@ namespace Footsies {
 			}
 		}
 
-		void UpdateIntroState() {
-			var p1Input = GetP1InputData();
-			var p2Input = GetP2InputData();
+		private void UpdateIntroState() {
+			InputData p1Input = GetP1InputData();
+			InputData p2Input = GetP2InputData();
 			RecordInput(p1Input, p2Input);
-			fighter1.UpdateInput(p1Input);
-			fighter2.UpdateInput(p2Input);
+			Fighter1.UpdateInput(p1Input);
+			Fighter2.UpdateInput(p2Input);
 
-			_fighters.ForEach((f) => f.IncrementActionFrame());
+			fighters.ForEach((f) => f.IncrementActionFrame());
 
-			_fighters.ForEach((f) => f.UpdateIntroAction());
-			_fighters.ForEach((f) => f.UpdateMovement());
-			_fighters.ForEach((f) => f.UpdateBoxes());
+			fighters.ForEach((f) => f.UpdateIntroAction());
+			fighters.ForEach((f) => f.UpdateMovement());
+			fighters.ForEach((f) => f.UpdateBoxes());
 
 			UpdatePushCharacterVsCharacter();
 			UpdatePushCharacterVsBackground();
 		}
 
-		void UpdateFightState() {
-			var p1Input = GetP1InputData();
-			var p2Input = GetP2InputData();
+		private void UpdateFightState() {
+			InputData p1Input = GetP1InputData();
+			InputData p2Input = GetP2InputData();
 			RecordInput(p1Input, p2Input);
-			fighter1.UpdateInput(p1Input);
-			fighter2.UpdateInput(p2Input);
+			Fighter1.UpdateInput(p1Input);
+			Fighter2.UpdateInput(p2Input);
 
-			_fighters.ForEach((f) => f.IncrementActionFrame());
+			fighters.ForEach((f) => f.IncrementActionFrame());
 
-			_fighters.ForEach((f) => f.UpdateActionRequest());
-			_fighters.ForEach((f) => f.UpdateMovement());
-			_fighters.ForEach((f) => f.UpdateBoxes());
+			fighters.ForEach((f) => f.UpdateActionRequest());
+			fighters.ForEach((f) => f.UpdateMovement());
+			fighters.ForEach((f) => f.UpdateBoxes());
 
 			UpdatePushCharacterVsCharacter();
 			UpdatePushCharacterVsBackground();
 			UpdateHitboxHurtboxCollision();
 		}
 
-		void UpdateKOState() { }
+		private void UpdateKOState() { }
 
-		void UpdateEndState() {
-			_fighters.ForEach((f) => f.IncrementActionFrame());
+		private void UpdateEndState() {
+			fighters.ForEach((f) => f.IncrementActionFrame());
 
-			_fighters.ForEach((f) => f.UpdateActionRequest());
-			_fighters.ForEach((f) => f.UpdateMovement());
-			_fighters.ForEach((f) => f.UpdateBoxes());
+			fighters.ForEach((f) => f.UpdateActionRequest());
+			fighters.ForEach((f) => f.UpdateMovement());
+			fighters.ForEach((f) => f.UpdateBoxes());
 
 			UpdatePushCharacterVsCharacter();
 			UpdatePushCharacterVsBackground();
 		}
 
-		InputData GetP1InputData() {
+		private InputData GetP1InputData() {
 			if (isReplayingLastRoundInput) {
 				return lastRoundP1Input[currentReplayingInputIndex];
 			}
 
-			var time = Time.fixedTime - roundStartTime;
+			float time = Time.fixedTime - roundStartTime;
 
 			InputData p1Input = new InputData();
-			p1Input.input |= InputManager.Instance.GetButton(InputManager.Command.p1Left) ? (int) InputDefine.Left : 0;
-			p1Input.input |= InputManager.Instance.GetButton(InputManager.Command.p1Right)
+			p1Input.Input |= InputManager.Instance.GetButton(InputManager.Command.P1Left) ? (int) InputDefine.Left : 0;
+			p1Input.Input |= InputManager.Instance.GetButton(InputManager.Command.P1Right)
 				? (int) InputDefine.Right
 				: 0;
-			p1Input.input |= InputManager.Instance.GetButton(InputManager.Command.p1Attack)
+			p1Input.Input |= InputManager.Instance.GetButton(InputManager.Command.P1Attack)
 				? (int) InputDefine.Attack
 				: 0;
-			p1Input.time = time;
+			p1Input.Time = time;
 
-			if (debugP1Attack)
-				p1Input.input |= (int) InputDefine.Attack;
-			if (debugP1Guard)
-				p1Input.input |= (int) InputDefine.Left;
+			if (debugP1Attack) {
+				p1Input.Input |= (int) InputDefine.Attack;
+			}
+
+			if (debugP1Guard) {
+				p1Input.Input |= (int) InputDefine.Left;
+			}
 
 			return p1Input;
 		}
 
-		InputData GetP2InputData() {
+		private InputData GetP2InputData() {
 			if (isReplayingLastRoundInput) {
 				return lastRoundP2Input[currentReplayingInputIndex];
 			}
 
-			var time = Time.fixedTime - roundStartTime;
+			float time = Time.fixedTime - roundStartTime;
 
 			InputData p2Input = new InputData();
 
 			if (battleAI != null) {
-				p2Input.input |= battleAI.getNextAIInput();
+				p2Input.Input |= battleAI.GetNextAIInput();
 			} else {
-				p2Input.input |= InputManager.Instance.GetButton(InputManager.Command.p2Left)
+				p2Input.Input |= InputManager.Instance.GetButton(InputManager.Command.P2Left)
 					? (int) InputDefine.Left
 					: 0;
-				p2Input.input |= InputManager.Instance.GetButton(InputManager.Command.p2Right)
+				p2Input.Input |= InputManager.Instance.GetButton(InputManager.Command.P2Right)
 					? (int) InputDefine.Right
 					: 0;
-				p2Input.input |= InputManager.Instance.GetButton(InputManager.Command.p2Attack)
+				p2Input.Input |= InputManager.Instance.GetButton(InputManager.Command.P2Attack)
 					? (int) InputDefine.Attack
 					: 0;
 			}
 
-			p2Input.time = time;
+			p2Input.Time = time;
 
-			if (debugP2Attack)
-				p2Input.input |= (int) InputDefine.Attack;
-			if (debugP2Guard)
-				p2Input.input |= (int) InputDefine.Right;
+			if (debugP2Attack) {
+				p2Input.Input |= (int) InputDefine.Attack;
+			}
+
+			if (debugP2Guard) {
+				p2Input.Input |= (int) InputDefine.Right;
+			}
 
 			return p2Input;
 		}
 
 		private bool IsKOSkipButtonPressed() {
-			if (InputManager.Instance.GetButton(InputManager.Command.p1Attack))
+			if (InputManager.Instance.GetButton(InputManager.Command.P1Attack)) {
 				return true;
+			}
 
-			if (InputManager.Instance.GetButton(InputManager.Command.p2Attack))
+			if (InputManager.Instance.GetButton(InputManager.Command.P2Attack)) {
 				return true;
+			}
 
 			return false;
 		}
 
-		void UpdatePushCharacterVsCharacter() {
-			var rect1 = fighter1.pushbox.rect;
-			var rect2 = fighter2.pushbox.rect;
+		private void UpdatePushCharacterVsCharacter() {
+			Rect rect1 = Fighter1.Pushbox.Rect;
+			Rect rect2 = Fighter2.Pushbox.Rect;
 
 			if (rect1.Overlaps(rect2)) {
-				if (fighter1.position.x < fighter2.position.x) {
-					fighter1.ApplyPositionChange((rect1.xMax - rect2.xMin) * -1 / 2, fighter1.position.y);
-					fighter2.ApplyPositionChange((rect1.xMax - rect2.xMin) * 1 / 2, fighter2.position.y);
-				} else if (fighter1.position.x > fighter2.position.x) {
-					fighter1.ApplyPositionChange((rect2.xMax - rect1.xMin) * 1 / 2, fighter1.position.y);
-					fighter2.ApplyPositionChange((rect2.xMax - rect1.xMin) * -1 / 2, fighter1.position.y);
+				if (Fighter1.Position.x < Fighter2.Position.x) {
+					Fighter1.ApplyPositionChange((rect1.xMax - rect2.xMin) * -1 / 2, Fighter1.Position.y);
+					Fighter2.ApplyPositionChange((rect1.xMax - rect2.xMin) * 1 / 2, Fighter2.Position.y);
+				} else if (Fighter1.Position.x > Fighter2.Position.x) {
+					Fighter1.ApplyPositionChange((rect2.xMax - rect1.xMin) * 1 / 2, Fighter1.Position.y);
+					Fighter2.ApplyPositionChange((rect2.xMax - rect1.xMin) * -1 / 2, Fighter1.Position.y);
 				}
 			}
 		}
 
-		void UpdatePushCharacterVsBackground() {
-			var stageMinX = battleAreaWidth * -1 / 2;
-			var stageMaxX = battleAreaWidth / 2;
+		private void UpdatePushCharacterVsBackground() {
+			float stageMinX = BattleAreaWidth * -1 / 2;
+			float stageMaxX = BattleAreaWidth / 2;
 
-			_fighters.ForEach((f) => {
-				if (f.pushbox.xMin < stageMinX) {
-					f.ApplyPositionChange(stageMinX - f.pushbox.xMin, f.position.y);
-				} else if (f.pushbox.xMax > stageMaxX) {
-					f.ApplyPositionChange(stageMaxX - f.pushbox.xMax, f.position.y);
+			fighters.ForEach((f) => {
+				if (f.Pushbox.XMin < stageMinX) {
+					f.ApplyPositionChange(stageMinX - f.Pushbox.XMin, f.Position.y);
+				} else if (f.Pushbox.XMax > stageMaxX) {
+					f.ApplyPositionChange(stageMaxX - f.Pushbox.XMax, f.Position.y);
 				}
 			});
 		}
 
-		void UpdateHitboxHurtboxCollision() {
-			foreach (var attacker in _fighters) {
+		private void UpdateHitboxHurtboxCollision() {
+			foreach (Fighter attacker in fighters) {
 				Vector2 damagePos = Vector2.zero;
 				bool isHit = false;
 				bool isProximity = false;
 				int hitAttackID = 0;
 
-				foreach (var damaged in _fighters) {
-					if (attacker == damaged)
+				foreach (Fighter damaged in fighters) {
+					if (attacker == damaged) {
 						continue;
+					}
 
-					foreach (var hitbox in attacker.hitboxes) {
+					foreach (Hitbox hitbox in attacker.Hitboxes) {
 						// continue if attack already hit
-						if (!attacker.CanAttackHit(hitbox.attackID)) {
+						if (!attacker.CanAttackHit(hitbox.AttackID)) {
 							continue;
 						}
 
-						foreach (var hurtbox in damaged.hurtboxes) {
+						foreach (Hurtbox hurtbox in damaged.Hurtboxes) {
 							if (hitbox.Overlaps(hurtbox)) {
-								if (hitbox.proximity) {
+								if (hitbox.Proximity) {
 									isProximity = true;
 								} else {
 									isHit = true;
-									hitAttackID = hitbox.attackID;
-									float x1 = Mathf.Min(hitbox.xMax, hurtbox.xMax);
-									float x2 = Mathf.Max(hitbox.xMin, hurtbox.xMin);
-									float y1 = Mathf.Min(hitbox.yMax, hurtbox.yMax);
-									float y2 = Mathf.Max(hitbox.yMin, hurtbox.yMin);
+									hitAttackID = hitbox.AttackID;
+									float x1 = Mathf.Min(hitbox.XMax, hurtbox.XMax);
+									float x2 = Mathf.Max(hitbox.XMin, hurtbox.XMin);
+									float y1 = Mathf.Min(hitbox.YMax, hurtbox.YMax);
+									float y2 = Mathf.Max(hitbox.YMin, hurtbox.YMin);
 									damagePos.x = (x1 + x2) / 2;
 									damagePos.y = (y1 + y2) / 2;
 									break;
@@ -407,15 +409,17 @@ namespace Footsies {
 							}
 						}
 
-						if (isHit)
+						if (isHit) {
 							break;
+						}
 					}
 
 					if (isHit) {
 						attacker.NotifyAttackHit(damaged, damagePos);
-						var damageResult = damaged.NotifyDamaged(attacker.getAttackData(hitAttackID), damagePos);
+						DamageResult damageResult =
+							damaged.NotifyDamaged(attacker.GetAttackData(hitAttackID), damagePos);
 
-						var hitStunFrame = attacker.GetHitStunFrame(damageResult, hitAttackID);
+						int hitStunFrame = attacker.GetHitStunFrame(damageResult, hitAttackID);
 						attacker.SetHitStun(hitStunFrame);
 						damaged.SetHitStun(hitStunFrame);
 						damaged.SetSpriteShakeFrame(hitStunFrame / 3);
@@ -428,21 +432,23 @@ namespace Footsies {
 			}
 		}
 
-		void RecordInput(InputData p1Input, InputData p2Input) {
-			if (currentRecordingInputIndex >= maxRecordingInputFrame)
+		private void RecordInput(InputData p1Input, InputData p2Input) {
+			if (currentRecordingInputIndex >= maxRecordingInputFrame) {
 				return;
+			}
 
 			recordingP1Input[currentRecordingInputIndex] = p1Input.ShallowCopy();
 			recordingP2Input[currentRecordingInputIndex] = p2Input.ShallowCopy();
 			currentRecordingInputIndex++;
 
 			if (isReplayingLastRoundInput) {
-				if (currentReplayingInputIndex < lastRoundMaxRecordingInput)
+				if (currentReplayingInputIndex < lastRoundMaxRecordingInput) {
 					currentReplayingInputIndex++;
+				}
 			}
 		}
 
-		void CopyLastRoundInput() {
+		private void CopyLastRoundInput() {
 			for (int i = 0; i < currentRecordingInputIndex; i++) {
 				lastRoundP1Input[i] = recordingP1Input[i].ShallowCopy();
 				lastRoundP2Input[i] = recordingP2Input[i].ShallowCopy();
@@ -454,17 +460,17 @@ namespace Footsies {
 			currentReplayingInputIndex = 0;
 		}
 
-		void StartPlayLastRoundInput() {
+		private void StartPlayLastRoundInput() {
 			isReplayingLastRoundInput = true;
 			currentReplayingInputIndex = 0;
 		}
 
-		bool CheckUpdateDebugPause() {
+		private bool CheckUpdateDebugPause() {
 			if (Input.GetKeyDown(KeyCode.F1)) {
-				isDebugPause = !isDebugPause;
+				IsDebugPause = !IsDebugPause;
 			}
 
-			if (isDebugPause) {
+			if (IsDebugPause) {
 				// press f2 during debug pause to 
 				if (Input.GetKeyDown(KeyCode.F2)) {
 					return false;
@@ -477,18 +483,21 @@ namespace Footsies {
 		}
 
 		public int GetFrameAdvantage(bool getP1) {
-			var p1FrameLeft = fighter1.currentActionFrameCount - fighter1.currentActionFrame;
-			if (fighter1.isAlwaysCancelable)
+			int p1FrameLeft = Fighter1.CurrentActionFrameCount - Fighter1.CurrentActionFrame;
+			if (Fighter1.IsAlwaysCancellable) {
 				p1FrameLeft = 0;
+			}
 
-			var p2FrameLeft = fighter2.currentActionFrameCount - fighter2.currentActionFrame;
-			if (fighter2.isAlwaysCancelable)
+			int p2FrameLeft = Fighter2.CurrentActionFrameCount - Fighter2.CurrentActionFrame;
+			if (Fighter2.IsAlwaysCancellable) {
 				p2FrameLeft = 0;
+			}
 
-			if (getP1)
+			if (getP1) {
 				return p2FrameLeft - p1FrameLeft;
-			else
+			} else {
 				return p1FrameLeft - p2FrameLeft;
+			}
 		}
 	}
 }

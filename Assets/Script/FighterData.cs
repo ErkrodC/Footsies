@@ -1,6 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+
+#pragma warning disable 649
 
 namespace Footsies {
 	/// <summary>
@@ -29,25 +30,19 @@ namespace Footsies {
 
 		[SerializeField] private MotionDataContainer motionDataContainer;
 
-		public Dictionary<int, ActionData> actions {
-			get { return _actions; }
-		}
+		public Dictionary<int, ActionData> Actions => actions;
 
-		private Dictionary<int, ActionData> _actions = new Dictionary<int, ActionData>();
+		private Dictionary<int, ActionData> actions = new Dictionary<int, ActionData>();
 
-		public Dictionary<int, AttackData> attackData {
-			get { return _attackData; }
-		}
+		public Dictionary<int, AttackData> AttackData => attackData;
 
-		private Dictionary<int, AttackData> _attackData = new Dictionary<int, AttackData>();
+		private Dictionary<int, AttackData> attackData = new Dictionary<int, AttackData>();
 
-		public Dictionary<int, MotionData> motionData {
-			get { return _motionData; }
-		}
+		public Dictionary<int, MotionData> MotionData => motionData;
 
-		private Dictionary<int, MotionData> _motionData = new Dictionary<int, MotionData>();
+		private Dictionary<int, MotionData> motionData = new Dictionary<int, MotionData>();
 
-		public void setupDictionary() {
+		public void SetupDictionary() {
 			if (actionDataContainer == null) {
 				Debug.LogError("ActionDataContainer is not set");
 				return;
@@ -56,19 +51,19 @@ namespace Footsies {
 				return;
 			}
 
-			_actions = new Dictionary<int, ActionData>();
-			foreach (var action in actionDataContainer.actions) {
-				_actions.Add(action.actionID, action);
+			actions = new Dictionary<int, ActionData>();
+			foreach (ActionData action in actionDataContainer.actions) {
+				actions.Add(action.actionID, action);
 			}
 
-			_attackData = new Dictionary<int, AttackData>();
-			foreach (var data in attackDataContainer.attackDataList) {
-				_attackData.Add(data.attackID, data);
+			attackData = new Dictionary<int, AttackData>();
+			foreach (AttackData data in attackDataContainer.attackDataList) {
+				attackData.Add(data.attackID, data);
 			}
 
-			_motionData = new Dictionary<int, MotionData>();
-			foreach (var data in motionDataContainer.motionDataList) {
-				_motionData.Add(data.motionID, data);
+			motionData = new Dictionary<int, MotionData>();
+			foreach (MotionData data in motionDataContainer.motionDataList) {
+				motionData.Add(data.motionID, data);
 			}
 		}
 	}

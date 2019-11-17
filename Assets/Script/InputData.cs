@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Footsies {
+﻿namespace Footsies {
 	public enum InputDefine {
 		None = 0,
 		Left = 1 << 0,
@@ -11,11 +7,11 @@ namespace Footsies {
 	}
 
 	public class InputData {
-		public int input;
-		public float time;
+		public int Input;
+		public float Time;
 
 		public InputData ShallowCopy() {
-			return (InputData) this.MemberwiseClone();
+			return (InputData) MemberwiseClone();
 		}
 	}
 }

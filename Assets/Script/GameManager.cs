@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Footsies {
@@ -12,11 +10,11 @@ namespace Footsies {
 
 		public AudioClip menuSelectAudioClip;
 
-		public SceneIndex currentScene { get; private set; }
-		public bool isVsCPU { get; private set; }
+		public SceneIndex CurrentScene { get; private set; }
+		public bool IsVsCPU { get; private set; }
 
 		private void Awake() {
-			DontDestroyOnLoad(this.gameObject);
+			DontDestroyOnLoad(gameObject);
 
 			Application.targetFrameRate = 60;
 		}
@@ -26,7 +24,7 @@ namespace Footsies {
 		}
 
 		private void Update() {
-			if (currentScene == SceneIndex.Battle) {
+			if (CurrentScene == SceneIndex.Battle) {
 				if (Input.GetButtonDown("Cancel")) {
 					LoadTitleScene();
 				}
@@ -35,25 +33,25 @@ namespace Footsies {
 
 		public void LoadTitleScene() {
 			SceneManager.LoadScene((int) SceneIndex.Title);
-			currentScene = SceneIndex.Title;
+			CurrentScene = SceneIndex.Title;
 		}
 
 		public void LoadVsPlayerScene() {
-			isVsCPU = false;
+			IsVsCPU = false;
 			LoadBattleScene();
 		}
 
 		public void LoadVsCPUScene() {
-			isVsCPU = true;
+			IsVsCPU = true;
 			LoadBattleScene();
 		}
 
 		private void LoadBattleScene() {
 			SceneManager.LoadScene((int) SceneIndex.Battle);
-			currentScene = SceneIndex.Battle;
+			CurrentScene = SceneIndex.Battle;
 
 			if (menuSelectAudioClip != null) {
-				SoundManager.Instance.playSE(menuSelectAudioClip);
+				SoundManager.Instance.PlaySE(menuSelectAudioClip);
 			}
 		}
 	}

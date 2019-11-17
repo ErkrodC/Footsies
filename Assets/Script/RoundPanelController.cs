@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
+
+#pragma warning disable 649
 
 namespace Footsies {
 	/// <summary>
@@ -27,7 +27,7 @@ namespace Footsies {
 
 		#endregion
 
-		void Awake() {
+		private void Awake() {
 			if (_battleCoreGameObject != null) {
 				battleCore = _battleCoreGameObject.GetComponent<BattleCore>();
 			}
@@ -42,21 +42,23 @@ namespace Footsies {
 		}
 
 		// Update is called once per frame
-		void Update() {
-			if (currentRoundWon != getRoundWon()) {
-				currentRoundWon = getRoundWon();
+		private void Update() {
+			if (currentRoundWon != GetRoundWon()) {
+				currentRoundWon = GetRoundWon();
 				UpdateRoundWonImages();
 			}
 		}
 
-		private uint getRoundWon() {
-			if (battleCore == null)
+		private uint GetRoundWon() {
+			if (battleCore == null) {
 				return 0;
+			}
 
-			if (isPlayerOne)
-				return battleCore.fighter1RoundWon;
-			else
-				return battleCore.fighter2RoundWon;
+			if (isPlayerOne) {
+				return battleCore.Fighter1RoundWon;
+			} else {
+				return battleCore.Fighter2RoundWon;
+			}
 		}
 
 		private void UpdateRoundWonImages() {

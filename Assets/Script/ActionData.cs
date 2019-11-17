@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Footsies {
 	public abstract class FrameDataBase {
-		public Vector2Int startEndFrame;
+		public Vector2Int StartEndFrame;
 	}
 
 	[System.Serializable]
@@ -75,69 +74,76 @@ namespace Footsies {
 		public AudioClip audioClip;
 
 		public MotionFrameData GetMotionData(int frame) {
-			foreach (var data in motions) {
-				if (frame >= data.startEndFrame.x && frame <= data.startEndFrame.y)
+			foreach (MotionFrameData data in motions) {
+				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
 					return data;
+				}
 			}
 
 			return null;
 		}
 
 		public StatusData GetStatusData(int frame) {
-			foreach (var data in status) {
-				if (frame >= data.startEndFrame.x && frame <= data.startEndFrame.y)
+			foreach (StatusData data in status) {
+				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
 					return data;
+				}
 			}
 
 			return null;
 		}
 
 		public List<HitboxData> GetHitboxData(int frame) {
-			var hb = new List<HitboxData>();
+			List<HitboxData> hb = new List<HitboxData>();
 
-			foreach (var data in this.hitboxes) {
-				if (frame >= data.startEndFrame.x && frame <= data.startEndFrame.y)
+			foreach (HitboxData data in hitboxes) {
+				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
 					hb.Add(data);
+				}
 			}
 
 			return hb;
 		}
 
 		public List<HurtboxData> GetHurtboxData(int frame) {
-			var hb = new List<HurtboxData>();
+			List<HurtboxData> hb = new List<HurtboxData>();
 
-			foreach (var data in this.hurtboxes) {
-				if (frame >= data.startEndFrame.x && frame <= data.startEndFrame.y)
+			foreach (HurtboxData data in hurtboxes) {
+				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
 					hb.Add(data);
+				}
 			}
 
 			return hb;
 		}
 
 		public PushboxData GetPushboxData(int frame) {
-			foreach (var data in this.pushboxes) {
-				if (frame >= data.startEndFrame.x && frame <= data.startEndFrame.y)
+			foreach (PushboxData data in pushboxes) {
+				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
 					return data;
+				}
 			}
 
 			return null;
 		}
 
 		public MovementData GetMovementData(int frame) {
-			foreach (var data in this.movements) {
-				if (frame >= data.startEndFrame.x && frame <= data.startEndFrame.y)
+			foreach (MovementData data in movements) {
+				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
 					return data;
+				}
 			}
 
 			return null;
 		}
 
 		public List<CancelData> GetCancelData(int frame) {
-			var cd = new List<CancelData>();
+			List<CancelData> cd = new List<CancelData>();
 
-			foreach (var data in this.cancels) {
-				if (frame >= data.startEndFrame.x && frame <= data.startEndFrame.y)
+			foreach (CancelData data in cancels) {
+				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
 					cd.Add(data);
+				}
 			}
 
 			return cd;

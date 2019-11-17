@@ -1,16 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Footsies {
 	public class BattleAI {
 		public class FightState {
-			public float distanceX;
-			public bool isOpponentDamage;
-			public bool isOpponentGuardBreak;
-			public bool isOpponentBlocking;
-			public bool isOpponentNormalAttack;
-			public bool isOpponentSpecialAttack;
+			public float DistanceX;
+			public bool IsOpponentDamage;
+			public bool IsOpponentGuardBreak;
+			public bool IsOpponentBlocking;
+			public bool IsOpponentNormalAttack;
+			public bool IsOpponentSpecialAttack;
 		}
 
 		private BattleCore battleCore;
@@ -19,30 +18,30 @@ namespace Footsies {
 		private Queue<int> attackQueue = new Queue<int>();
 
 		// previous fight state data
-		private FightState[] fightStates = new FightState[maxFightStateRecord];
-		public static readonly uint maxFightStateRecord = 10;
+		private FightState[] fightStates = new FightState[MaxFightStateRecord];
+		public static readonly uint MaxFightStateRecord = 10;
 		private int fightStateReadIndex = 5;
 
 		public BattleAI(BattleCore core) {
 			battleCore = core;
 		}
 
-		public int getNextAIInput() {
+		public int GetNextAIInput() {
 			int input = 0;
 
 			UpdateFightState();
-			var fightState = GetCurrentFightState();
+			FightState fightState = GetCurrentFightState();
 			if (fightState != null) {
 				//Debug.Log(fightState.distanceX);
-				if (moveQueue.Count > 0)
+				if (moveQueue.Count > 0) {
 					input |= moveQueue.Dequeue();
-				else if (moveQueue.Count == 0) {
+				} else if (moveQueue.Count == 0) {
 					SelectMovement(fightState);
 				}
 
-				if (attackQueue.Count > 0)
+				if (attackQueue.Count > 0) {
 					input |= attackQueue.Dequeue();
-				else if (attackQueue.Count == 0) {
+				} else if (attackQueue.Count == 0) {
 					SelectAttack(fightState);
 				}
 			}
@@ -51,103 +50,113 @@ namespace Footsies {
 		}
 
 		private void SelectMovement(FightState fightState) {
-			if (fightState.distanceX > 4f) {
-				var rand = Random.Range(0, 2);
-				if (rand == 0)
+			if (fightState.DistanceX > 4f) {
+				int rand = Random.Range(0, 2);
+				if (rand == 0) {
 					AddFarApproach1();
-				else
+				} else {
 					AddFarApproach2();
-			} else if (fightState.distanceX > 3f) {
-				var rand = Random.Range(0, 7);
-				if (rand <= 1)
+				}
+			} else if (fightState.DistanceX > 3f) {
+				int rand = Random.Range(0, 7);
+				if (rand <= 1) {
 					AddMidApproach1();
-				else if (rand <= 3)
+				} else if (rand <= 3) {
 					AddMidApproach2();
-				else if (rand == 4)
+				} else if (rand == 4) {
 					AddFarApproach1();
-				else if (rand == 5)
+				} else if (rand == 5) {
 					AddFarApproach2();
-				else
+				} else {
 					AddNeutralMovement();
-			} else if (fightState.distanceX > 2.5f) {
-				var rand = Random.Range(0, 5);
-				if (rand == 0)
+				}
+			} else if (fightState.DistanceX > 2.5f) {
+				int rand = Random.Range(0, 5);
+				if (rand == 0) {
 					AddMidApproach1();
-				else if (rand == 1)
+				} else if (rand == 1) {
 					AddMidApproach2();
-				else if (rand == 2)
+				} else if (rand == 2) {
 					AddFallBack1();
-				else if (rand == 3)
+				} else if (rand == 3) {
 					AddFallBack2();
-				else
+				} else {
 					AddNeutralMovement();
-			} else if (fightState.distanceX > 2f) {
-				var rand = Random.Range(0, 4);
-				if (rand == 0)
+				}
+			} else if (fightState.DistanceX > 2f) {
+				int rand = Random.Range(0, 4);
+				if (rand == 0) {
 					AddFallBack1();
-				else if (rand == 1)
+				} else if (rand == 1) {
 					AddFallBack2();
-				else
+				} else {
 					AddNeutralMovement();
+				}
 			} else {
-				var rand = Random.Range(0, 3);
-				if (rand == 0)
+				int rand = Random.Range(0, 3);
+				if (rand == 0) {
 					AddFallBack1();
-				else if (rand == 1)
+				} else if (rand == 1) {
 					AddFallBack2();
-				else
+				} else {
 					AddNeutralMovement();
+				}
 			}
 		}
 
 		private void SelectAttack(FightState fightState) {
-			if (fightState.isOpponentDamage
-			    || fightState.isOpponentGuardBreak
-			    || fightState.isOpponentSpecialAttack) {
+			if (fightState.IsOpponentDamage
+			    || fightState.IsOpponentGuardBreak
+			    || fightState.IsOpponentSpecialAttack) {
 				AddTwoHitImmediateAttack();
-			} else if (fightState.distanceX > 4f) {
-				var rand = Random.Range(0, 4);
-				if (rand <= 3)
+			} else if (fightState.DistanceX > 4f) {
+				int rand = Random.Range(0, 4);
+				if (rand <= 3) {
 					AddNoAttack();
-				else
+				} else {
 					AddDelaySpecialAttack();
-			} else if (fightState.distanceX > 3f) {
-				if (fightState.isOpponentNormalAttack) {
+				}
+			} else if (fightState.DistanceX > 3f) {
+				if (fightState.IsOpponentNormalAttack) {
 					AddTwoHitImmediateAttack();
 					return;
 				}
 
-				var rand = Random.Range(0, 5);
-				if (rand <= 1)
+				int rand = Random.Range(0, 5);
+				if (rand <= 1) {
 					AddNoAttack();
-				else if (rand <= 3)
+				} else if (rand <= 3) {
 					AddOneHitImmediateAttack();
-				else
+				} else {
 					AddDelaySpecialAttack();
-			} else if (fightState.distanceX > 2.5f) {
-				var rand = Random.Range(0, 3);
-				if (rand == 0)
+				}
+			} else if (fightState.DistanceX > 2.5f) {
+				int rand = Random.Range(0, 3);
+				if (rand == 0) {
 					AddNoAttack();
-				else if (rand == 1)
+				} else if (rand == 1) {
 					AddOneHitImmediateAttack();
-				else
+				} else {
 					AddTwoHitImmediateAttack();
-			} else if (fightState.distanceX > 2f) {
-				var rand = Random.Range(0, 6);
-				if (rand <= 1)
+				}
+			} else if (fightState.DistanceX > 2f) {
+				int rand = Random.Range(0, 6);
+				if (rand <= 1) {
 					AddOneHitImmediateAttack();
-				else if (rand <= 3)
+				} else if (rand <= 3) {
 					AddTwoHitImmediateAttack();
-				else if (rand == 4)
+				} else if (rand == 4) {
 					AddImmediateSpecialAttack();
-				else
+				} else {
 					AddDelaySpecialAttack();
+				}
 			} else {
-				var rand = Random.Range(0, 3);
-				if (rand == 0)
+				int rand = Random.Range(0, 3);
+				if (rand == 0) {
 					AddOneHitImmediateAttack();
-				else
+				} else {
 					AddTwoHitImmediateAttack();
+				}
 			}
 		}
 
@@ -282,21 +291,21 @@ namespace Footsies {
 		}
 
 		private void UpdateFightState() {
-			var currentFightState = new FightState();
-			currentFightState.distanceX = GetDistanceX();
-			currentFightState.isOpponentDamage = battleCore.fighter1.currentActionID == (int) CommonActionID.DAMAGE;
-			currentFightState.isOpponentGuardBreak =
-				battleCore.fighter1.currentActionID == (int) CommonActionID.GUARD_BREAK;
-			currentFightState.isOpponentBlocking =
-				(battleCore.fighter1.currentActionID == (int) CommonActionID.GUARD_CROUCH
-				 || battleCore.fighter1.currentActionID == (int) CommonActionID.GUARD_STAND
-				 || battleCore.fighter1.currentActionID == (int) CommonActionID.GUARD_M);
-			currentFightState.isOpponentNormalAttack =
-				(battleCore.fighter1.currentActionID == (int) CommonActionID.N_ATTACK
-				 || battleCore.fighter1.currentActionID == (int) CommonActionID.B_ATTACK);
-			currentFightState.isOpponentSpecialAttack =
-				(battleCore.fighter1.currentActionID == (int) CommonActionID.N_SPECIAL
-				 || battleCore.fighter1.currentActionID == (int) CommonActionID.B_SPECIAL);
+			FightState currentFightState = new FightState();
+			currentFightState.DistanceX = GetDistanceX();
+			currentFightState.IsOpponentDamage = battleCore.Fighter1.CurrentActionID == (int) CommonActionID.Damage;
+			currentFightState.IsOpponentGuardBreak =
+				battleCore.Fighter1.CurrentActionID == (int) CommonActionID.GuardBreak;
+			currentFightState.IsOpponentBlocking =
+				battleCore.Fighter1.CurrentActionID == (int) CommonActionID.GuardCrouch
+				|| battleCore.Fighter1.CurrentActionID == (int) CommonActionID.GuardStand
+				|| battleCore.Fighter1.CurrentActionID == (int) CommonActionID.GuardM;
+			currentFightState.IsOpponentNormalAttack =
+				battleCore.Fighter1.CurrentActionID == (int) CommonActionID.NAttack
+				|| battleCore.Fighter1.CurrentActionID == (int) CommonActionID.BAttack;
+			currentFightState.IsOpponentSpecialAttack =
+				battleCore.Fighter1.CurrentActionID == (int) CommonActionID.NSpecial
+				|| battleCore.Fighter1.CurrentActionID == (int) CommonActionID.BSpecial;
 
 			for (int i = 1; i < fightStates.Length; i++) {
 				fightStates[i] = fightStates[i - 1];
@@ -310,7 +319,7 @@ namespace Footsies {
 		}
 
 		private float GetDistanceX() {
-			return Mathf.Abs(battleCore.fighter2.position.x - battleCore.fighter1.position.x);
+			return Mathf.Abs(battleCore.Fighter2.Position.x - battleCore.Fighter1.Position.x);
 		}
 
 		private int GetAttackInput() {

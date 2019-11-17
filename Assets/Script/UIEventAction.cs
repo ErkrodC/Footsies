@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
@@ -18,9 +16,9 @@ namespace Footsies {
 
 		private void Awake() {
 			if (action == Action.BGMToggle) {
-				var toggle = gameObject.GetComponent<Toggle>();
+				Toggle toggle = gameObject.GetComponent<Toggle>();
 				if (toggle != null) {
-					toggle.isOn = SoundManager.Instance.isBGMOn;
+					toggle.isOn = SoundManager.Instance.IsBGMOn;
 				}
 			}
 		}
@@ -37,7 +35,7 @@ namespace Footsies {
 					ExitGame();
 					break;
 				case Action.BGMToggle:
-					toggleBGM();
+					ToggleBGM();
 					break;
 				case Action.SEToggle:
 					break;
@@ -56,9 +54,9 @@ namespace Footsies {
 			Application.Quit();
 		}
 
-		public void toggleBGM() {
-			var isOn = SoundManager.Instance.toggleBGM();
-			var toggle = gameObject.GetComponent<Toggle>();
+		public void ToggleBGM() {
+			bool isOn = SoundManager.Instance.ToggleBGM();
+			Toggle toggle = gameObject.GetComponent<Toggle>();
 			if (toggle != null) {
 				toggle.isOn = isOn;
 			}

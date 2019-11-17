@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Footsies {
-	public class Draw {
+	public static class DrawUtil {
 		//****************************************************************************************************
 		//  static function DrawLine(Vector2 pointA, Vector2 pointB, color : Color, width : float) : void
 		//  
@@ -13,7 +11,8 @@ namespace Footsies {
 		//  This function works by drawing a 1x1 texture filled with a color, which is then scaled
 		//   and rotated by altering the GUI matrix.  The matrix is restored afterwards.
 		//****************************************************************************************************
-		public static Texture2D lineTex;
+		private static Texture2D lineTex;
+		private static Texture2D rectText;
 
 		public static void DrawLine(Vector2 pointA, Vector2 pointB, Color color, float width) {
 			// Generate a single pixel texture if it doesn't exist
@@ -21,22 +20,20 @@ namespace Footsies {
 				lineTex = new Texture2D(1, 1);
 			}
 
-			Matrix4x4 _saveMatrix = GUI.matrix;
-			Color _saveColor = GUI.color;
+			Matrix4x4 saveMatrix = GUI.matrix;
+			Color saveColor = GUI.color;
 			GUI.color = color;
 
-			Vector2 _delta = pointB - pointA;
-			GUIUtility.ScaleAroundPivot(new Vector2(_delta.magnitude, width), Vector2.zero);
-			GUIUtility.RotateAroundPivot(Vector2.Angle(_delta, Vector2.right) * Mathf.Sign(_delta.y), Vector2.zero);
+			Vector2 delta = pointB - pointA;
+			GUIUtility.ScaleAroundPivot(new Vector2(delta.magnitude, width), Vector2.zero);
+			GUIUtility.RotateAroundPivot(Vector2.Angle(delta, Vector2.right) * Mathf.Sign(delta.y), Vector2.zero);
 			GUI.matrix = Matrix4x4.TRS(pointA, Quaternion.identity, Vector3.one) * GUI.matrix;
 
 			GUI.DrawTexture(new Rect(Vector2.zero, Vector2.one), lineTex);
 
-			GUI.matrix = _saveMatrix;
-			GUI.color = _saveColor;
+			GUI.matrix = saveMatrix;
+			GUI.color = saveColor;
 		}
-
-		public static Texture2D rectText;
 
 		public static void DrawRect(Rect rect, Color color) {
 			// Generate a single pixel texture if it doesn't exist

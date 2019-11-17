@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Footsies {
 	public class CameraController : MonoBehaviour {
-		void Awake() {
-			DontDestroyOnLoad(this.gameObject);
+		private void Awake() {
+			DontDestroyOnLoad(gameObject);
 		}
 	}
 }

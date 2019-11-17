@@ -13,7 +13,7 @@ namespace Footsies {
 		private AudioSource bgmSource;
 
 		private float defaultBGMVolume;
-		public bool isBGMOn { get; private set; }
+		public bool IsBGMOn { get; private set; }
 
 		private void Awake() {
 			DontDestroyOnLoad(this);
@@ -22,30 +22,30 @@ namespace Footsies {
 			seSource2 = seSourceObject2.GetComponent<AudioSource>();
 			bgmSource = bgmSourceObject.GetComponent<AudioSource>();
 			defaultBGMVolume = bgmSource.volume;
-			isBGMOn = true;
+			IsBGMOn = true;
 		}
 
-		public bool toggleBGM() {
-			if (isBGMOn) {
+		public bool ToggleBGM() {
+			if (IsBGMOn) {
 				bgmSource.volume = 0;
-				isBGMOn = false;
+				IsBGMOn = false;
 			} else {
 				bgmSource.volume = defaultBGMVolume;
-				isBGMOn = true;
+				IsBGMOn = true;
 			}
 
-			return isBGMOn;
+			return IsBGMOn;
 		}
 
 
-		public void playSE(AudioClip clip) {
+		public void PlaySE(AudioClip clip) {
 			seSource1.clip = clip;
 			seSource1.panStereo = 0;
 			seSource1.Play();
 		}
 
-		public void playFighterSE(AudioClip clip, bool isPlayerOne, float posX) {
-			var audioSource = seSource1;
+		public void PlayFighterSE(AudioClip clip, bool isPlayerOne, float posX) {
+			AudioSource audioSource = seSource1;
 			if (!isPlayerOne) {
 				audioSource = seSource2;
 			}
