@@ -2,109 +2,54 @@
 using UnityEngine;
 
 namespace Footsies {
-	public class BoxBase {
-		public Rect Rect;
-
-		public float XMin => Rect.x - Rect.width / 2;
-
-		public float XMax => Rect.x + Rect.width / 2;
-
-		public float YMin => Rect.y;
-
-		public float YMax => Rect.y + Rect.height;
-
-		public bool Overlaps(BoxBase otherBox) {
-			bool c1 = otherBox.XMax >= XMin;
-			bool c2 = otherBox.XMin <= XMax;
-			bool c3 = otherBox.YMax >= YMin;
-			bool c4 = otherBox.YMin <= YMax;
-
-			return c1 && c2 && c3 && c4;
-		}
-	}
-
-	public class Hitbox : BoxBase {
-		public bool Proximity;
-		public int AttackID;
-	}
-
-	public class Hurtbox : BoxBase { }
-
-	public class Pushbox : BoxBase { }
-
-	public enum CommonActionID {
-		Stand = 0,
-		Forward = 1,
-		Backward = 2,
-		DashForward = 10,
-		DashBackward = 11,
-		NAttack = 100,
-		BAttack = 105,
-		NSpecial = 110,
-		BSpecial = 115,
-		Damage = 200,
-		GuardM = 301,
-		GuardStand = 305,
-		GuardCrouch = 306,
-		GuardBreak = 310,
-		GuardProximity = 350,
-		Dead = 500,
-		Win = 510,
-	}
-
-	public enum DamageResult {
-		Damage = 1,
-		Guard,
-		GuardBreak,
-		Counter,
-	}
-
 	public class Fighter {
-		public Vector2 Position;
-		public float VelocityX;
-		public bool IsFaceRight;
 
+		#region constants
+
+		private const int kMaxSpriteShakeFrame = 6;
+		private const int kInputRecordFrame = 180;
+
+		#endregion
+
+		#region public members and accessors
+		
+		public bool IsFaceRight;
+		public Vector2 Position;
+		public Pushbox Pushbox;
 		public List<Hitbox> Hitboxes = new List<Hitbox>();
 		public List<Hurtbox> Hurtboxes = new List<Hurtbox>();
-		public Pushbox Pushbox;
 
-		private FighterData fighterData;
-
-		public bool IsDead => VitalHealth <= 0;
-
-		public int VitalHealth { get; private set; }
+		public bool IsDead => vitalHealth <= 0;
 		public int GuardHealth { get; private set; }
-
 		public int CurrentActionID { get; private set; }
 		public int CurrentActionFrame { get; private set; }
-
 		public int CurrentActionFrameCount => fighterData.Actions[CurrentActionID].frameCount;
-
-		private bool IsActionEnd => CurrentActionFrame >= fighterData.Actions[CurrentActionID].frameCount;
-
 		public bool IsAlwaysCancellable => fighterData.Actions[CurrentActionID].alwaysCancelable;
-
-		public int CurrentActionHitCount { get; private set; }
-
 		public int CurrentHitStunFrame { get; private set; }
+		public int SpriteShakePosition { get; private set; }
 
-		public bool IsInHitStun => CurrentHitStunFrame > 0;
+		#endregion
 
-		private static int inputRecordFrame = 180;
-		private int[] input = new int[inputRecordFrame];
-		private int[] inputDown = new int[inputRecordFrame];
-		private int[] inputUp = new int[inputRecordFrame];
+		#region private members
 
-		private bool isInputBackward;
-		private bool isReserveProximityGuard;
+		private readonly int[] input = new int[kInputRecordFrame];
+		private readonly int[] inputDown = new int[kInputRecordFrame];
+		private readonly int[] inputUp = new int[kInputRecordFrame];
 
+		private int vitalHealth;
 		private int bufferActionID = -1;
 		private int reserveDamageActionID = -1;
-
-		public int SpriteShakePosition { get; private set; }
-		private int maxSpriteShakeFrame = 6;
-
+		private float velocityX;
+		private bool isInputBackward;
 		private bool hasWon;
+		private bool isReserveProximityGuard;
+		private FighterData fighterData;
+
+		private int CurrentActionHitCount { get; set; }
+		private bool IsActionEnd => CurrentActionFrame >= fighterData.Actions[CurrentActionID].frameCount;
+		private bool IsInHitStun => CurrentHitStunFrame > 0;
+
+		#endregion
 
 		/// <summary>
 		/// Setup fighter at the start of battle
@@ -117,11 +62,11 @@ namespace Footsies {
 			Position = startPosition;
 			IsFaceRight = isPlayerOne;
 
-			VitalHealth = 1;
+			vitalHealth = 1;
 			GuardHealth = fighterData.startGuardHealth;
 			hasWon = false;
 
-			VelocityX = 0;
+			velocityX = 0;
 
 			ClearInput();
 
@@ -279,9 +224,9 @@ namespace Footsies {
 			// Position changes from action data
 			MovementData movementData = fighterData.Actions[CurrentActionID].GetMovementData(CurrentActionFrame);
 			if (movementData != null) {
-				VelocityX = movementData.velocity_x;
-				if (VelocityX != 0) {
-					Position.x += VelocityX * sign * Time.deltaTime;
+				velocityX = movementData.velocity_x;
+				if (velocityX != 0) {
+					Position.x += velocityX * sign * Time.deltaTime;
 				}
 			}
 		}
@@ -346,9 +291,9 @@ namespace Footsies {
 				}
 			} else {
 				if (attackData.vitalHealthDamage > 0) {
-					VitalHealth -= attackData.vitalHealthDamage;
-					if (VitalHealth <= 0) {
-						VitalHealth = 0;
+					vitalHealth -= attackData.vitalHealthDamage;
+					if (vitalHealth <= 0) {
+						vitalHealth = 0;
 					}
 				}
 
@@ -390,8 +335,8 @@ namespace Footsies {
 		}
 
 		public void SetSpriteShakeFrame(int spriteShakeFrame) {
-			if (spriteShakeFrame > maxSpriteShakeFrame) {
-				spriteShakeFrame = maxSpriteShakeFrame;
+			if (spriteShakeFrame > kMaxSpriteShakeFrame) {
+				spriteShakeFrame = kMaxSpriteShakeFrame;
 			}
 
 			SpriteShakePosition = spriteShakeFrame * (IsFaceRight ? -1 : 1);

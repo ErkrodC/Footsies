@@ -3,15 +3,17 @@ using UnityEngine.SceneManagement;
 
 namespace Footsies {
 	public class GameManager : Singleton<GameManager> {
-		public enum SceneIndex {
-			Title = 1,
-			Battle = 2,
-		}
+		#region constants
+
+		private const int kTitleSceneIndex = 1;
+		private const int kBattleSceneIndex = 2;
+
+		#endregion
 
 		public AudioClip menuSelectAudioClip;
 
-		public SceneIndex CurrentScene { get; private set; }
 		public bool IsVsCPU { get; private set; }
+		private int currentScene;
 
 		private void Awake() {
 			DontDestroyOnLoad(gameObject);
@@ -24,7 +26,7 @@ namespace Footsies {
 		}
 
 		private void Update() {
-			if (CurrentScene == SceneIndex.Battle) {
+			if (currentScene == kBattleSceneIndex) {
 				if (Input.GetButtonDown("Cancel")) {
 					LoadTitleScene();
 				}
@@ -32,8 +34,8 @@ namespace Footsies {
 		}
 
 		public void LoadTitleScene() {
-			SceneManager.LoadScene((int) SceneIndex.Title);
-			CurrentScene = SceneIndex.Title;
+			SceneManager.LoadScene(kTitleSceneIndex);
+			currentScene = kTitleSceneIndex;
 		}
 
 		public void LoadVsPlayerScene() {
@@ -47,8 +49,8 @@ namespace Footsies {
 		}
 
 		private void LoadBattleScene() {
-			SceneManager.LoadScene((int) SceneIndex.Battle);
-			CurrentScene = SceneIndex.Battle;
+			SceneManager.LoadScene(kBattleSceneIndex);
+			currentScene = kBattleSceneIndex;
 
 			if (menuSelectAudioClip != null) {
 				SoundManager.Instance.PlaySE(menuSelectAudioClip);

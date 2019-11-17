@@ -9,81 +9,63 @@ namespace Footsies {
 	/// Update player/ai input, fighter actions, hitbox/hurtbox collision, round start/end
 	/// </summary>
 	public class BattleCore : MonoBehaviour {
-		public enum RoundStateType {
-			Stop,
-			Intro,
-			Fight,
-			KO,
-			End,
-		}
+		#region constants and statics
 
-		[SerializeField] private float _battleAreaWidth = 10f;
+		private const uint kMaxRecordingInputFrame = 60 * 60 * 5;
+		private const uint kMaxRoundWon = 3;
+		private const float kIntroStateTime = 3f;
+		private const float kKOStateTime = 2f;
+		private const float kEndStateTime = 3f;
+		private const float kEndStateSkippableTime = 1.5f;
+		private static readonly int roundStart = Animator.StringToHash("RoundStart");
+		private static readonly int roundEnd = Animator.StringToHash("RoundEnd");
 
-		public float BattleAreaWidth => _battleAreaWidth;
+		#endregion
 
-		// [field: SerializeField]
-		// public float BattleAreaMaxHeight { get; } = 2f;
-		[SerializeField] private float _battleAreaMaxHeight = 2f;
-		public float BattleAreaMaxHeight => _battleAreaMaxHeight;
+		#region public members and accessors
 
-		[SerializeField] private GameObject roundUI;
-
-		[SerializeField] private List<FighterData> fighterDataList = new List<FighterData>();
-
+		public float BattleAreaWidth = 10f;
+		public float BattleAreaMaxHeight = 2f;
 		public bool debugP1Attack;
 		public bool debugP2Attack;
 		public bool debugP1Guard;
 		public bool debugP2Guard;
 		public bool debugPlayLastRoundInput;
-
-		private float timer;
-		private const uint MaxRoundWon = 3;
+		public System.Action<Fighter, Vector2, DamageResult> damageHandler;
 
 		public Fighter Fighter1 { get; private set; }
 		public Fighter Fighter2 { get; private set; }
-
 		public uint Fighter1RoundWon { get; private set; }
 		public uint Fighter2RoundWon { get; private set; }
-
 		public List<Fighter> Fighters { get; } = new List<Fighter>();
 
+		#endregion
+
+		#region private members
+
+		[SerializeField] private GameObject roundUI;
+		[SerializeField] private List<FighterData> fighterDataList = new List<FighterData>();
+
+		private readonly InputData[] recordingP1Input = new InputData[kMaxRecordingInputFrame];
+		private readonly InputData[] recordingP2Input = new InputData[kMaxRecordingInputFrame];
+		private readonly InputData[] lastRoundP1Input = new InputData[kMaxRecordingInputFrame];
+		private readonly InputData[] lastRoundP2Input = new InputData[kMaxRecordingInputFrame];
+
+		private float timer;
 		private float roundStartTime;
 		private int frameCount;
-
-		public RoundStateType RoundState => roundState;
-
-		private RoundStateType roundState = RoundStateType.Stop;
-
-		public System.Action<Fighter, Vector2, DamageResult> damageHandler;
-
-		private Animator roundUIAnimator;
-
-		private BattleAI battleAI;
-
-		private const uint MaxRecordingInputFrame = 60 * 60 * 5;
-		private InputData[] recordingP1Input = new InputData[MaxRecordingInputFrame];
-		private InputData[] recordingP2Input = new InputData[MaxRecordingInputFrame];
 		private uint currentRecordingInputIndex;
-
-		private InputData[] lastRoundP1Input = new InputData[MaxRecordingInputFrame];
-		private InputData[] lastRoundP2Input = new InputData[MaxRecordingInputFrame];
 		private uint currentReplayingInputIndex;
 		private uint lastRoundMaxRecordingInput;
 		private bool isReplayingLastRoundInput;
+		private RoundStateType roundState = RoundStateType.Stop;
+		private Animator roundUIAnimator;
+		private BattleAI battleAI;
+		private bool isDebugPause;
 
-		private bool isDebugPause { get; set; }
+		#endregion
 
-		private const float IntroStateTime = 3f;
-		private const float KOStateTime = 2f;
-		private const float EndStateTime = 3f;
-		private const float EndStateSkippableTime = 1.5f;
-		private static readonly int RoundStart = Animator.StringToHash("RoundStart");
-		private static readonly int RoundEnd = Animator.StringToHash("RoundEnd");
-
-		public BattleCore() {
-			debugP2Attack = false;
-			debugP2Guard = false;
-		}
+		#region Monobehaviour
 
 		private void Awake() {
 			// Setup dictionary from ScriptableObject data
@@ -95,6 +77,9 @@ namespace Footsies {
 			Fighters.Add(Fighter1);
 			Fighters.Add(Fighter2);
 
+			debugP2Attack = false;
+			debugP2Guard = false;
+
 			if (roundUI != null) {
 				roundUIAnimator = roundUI.GetComponent<Animator>();
 			}
@@ -103,12 +88,9 @@ namespace Footsies {
 		private void FixedUpdate() {
 			switch (roundState) {
 				case RoundStateType.Stop:
-
 					ChangeRoundState(RoundStateType.Intro);
-
 					break;
 				case RoundStateType.Intro:
-
 					UpdateIntroState();
 
 					timer -= Time.deltaTime;
@@ -117,13 +99,12 @@ namespace Footsies {
 					}
 
 					if (debugPlayLastRoundInput
-						&& !isReplayingLastRoundInput) {
+					    && !isReplayingLastRoundInput) {
 						StartPlayLastRoundInput();
 					}
 
 					break;
 				case RoundStateType.Fight:
-
 					if (CheckUpdateDebugPause()) {
 						break;
 					}
@@ -139,7 +120,6 @@ namespace Footsies {
 
 					break;
 				case RoundStateType.KO:
-
 					UpdateKOState();
 					timer -= Time.deltaTime;
 					if (timer <= 0f) {
@@ -148,11 +128,11 @@ namespace Footsies {
 
 					break;
 				case RoundStateType.End:
-
 					UpdateEndState();
+
 					timer -= Time.deltaTime;
 					if (timer <= 0f
-						|| timer <= EndStateSkippableTime && IsKOSkipButtonPressed()) {
+					    || timer <= kEndStateSkippableTime && IsKOSkipButtonPressed()) {
 						ChangeRoundState(RoundStateType.Stop);
 					}
 
@@ -160,13 +140,17 @@ namespace Footsies {
 			}
 		}
 
+		#endregion
+
+		#region state machine
+
 		private void ChangeRoundState(RoundStateType state) {
 			roundState = state;
 			switch (roundState) {
 				case RoundStateType.Stop:
 
-					if (Fighter1RoundWon >= MaxRoundWon
-						|| Fighter2RoundWon >= MaxRoundWon) {
+					if (Fighter1RoundWon >= kMaxRoundWon
+					    || Fighter2RoundWon >= kMaxRoundWon) {
 						GameManager.Instance.LoadTitleScene();
 					}
 
@@ -176,9 +160,9 @@ namespace Footsies {
 					Fighter1.SetupBattleStart(fighterDataList[0], new Vector2(-2f, 0f), true);
 					Fighter2.SetupBattleStart(fighterDataList[0], new Vector2(2f, 0f), false);
 
-					timer = IntroStateTime;
+					timer = kIntroStateTime;
 
-					roundUIAnimator.SetTrigger(RoundStart);
+					roundUIAnimator.SetTrigger(roundStart);
 
 					if (GameManager.Instance.IsVsCPU) {
 						battleAI = new BattleAI(this);
@@ -195,7 +179,7 @@ namespace Footsies {
 					break;
 				case RoundStateType.KO:
 
-					timer = KOStateTime;
+					timer = kKOStateTime;
 
 					CopyLastRoundInput();
 
@@ -204,12 +188,12 @@ namespace Footsies {
 
 					battleAI = null;
 
-					roundUIAnimator.SetTrigger(RoundEnd);
+					roundUIAnimator.SetTrigger(roundEnd);
 
 					break;
 				case RoundStateType.End:
 
-					timer = EndStateTime;
+					timer = kEndStateTime;
 
 					List<Fighter> deadFighter = Fighters.FindAll((f) => f.IsDead);
 					if (deadFighter.Count == 1) {
@@ -272,6 +256,15 @@ namespace Footsies {
 
 			UpdatePushCharacterVsCharacter();
 			UpdatePushCharacterVsBackground();
+		}
+
+		#endregion
+
+		#region input
+		
+		private static bool IsKOSkipButtonPressed() {
+			return InputManager.Instance.GetButton(InputManager.Command.P1Attack)
+			       || InputManager.Instance.GetButton(InputManager.Command.P2Attack);
 		}
 
 		private InputData GetP1InputData() {
@@ -337,31 +330,56 @@ namespace Footsies {
 
 			return p2Input;
 		}
-
-		private bool IsKOSkipButtonPressed() {
-			if (InputManager.Instance.GetButton(InputManager.Command.P1Attack)) {
-				return true;
+		
+		private void RecordInput(InputData p1Input, InputData p2Input) {
+			if (currentRecordingInputIndex >= kMaxRecordingInputFrame) {
+				return;
 			}
 
-			if (InputManager.Instance.GetButton(InputManager.Command.P2Attack)) {
-				return true;
-			}
+			recordingP1Input[currentRecordingInputIndex] = p1Input.ShallowCopy();
+			recordingP2Input[currentRecordingInputIndex] = p2Input.ShallowCopy();
+			currentRecordingInputIndex++;
 
-			return false;
+			if (isReplayingLastRoundInput) {
+				if (currentReplayingInputIndex < lastRoundMaxRecordingInput) {
+					currentReplayingInputIndex++;
+				}
+			}
 		}
+
+		private void CopyLastRoundInput() {
+			for (int i = 0; i < currentRecordingInputIndex; i++) {
+				lastRoundP1Input[i] = recordingP1Input[i].ShallowCopy();
+				lastRoundP2Input[i] = recordingP2Input[i].ShallowCopy();
+			}
+
+			lastRoundMaxRecordingInput = currentRecordingInputIndex;
+
+			isReplayingLastRoundInput = false;
+			currentReplayingInputIndex = 0;
+		}
+
+		private void StartPlayLastRoundInput() {
+			isReplayingLastRoundInput = true;
+			currentReplayingInputIndex = 0;
+		}
+
+		#endregion
+
+		#region updates
 
 		private void UpdatePushCharacterVsCharacter() {
 			Rect rect1 = Fighter1.Pushbox.Rect;
 			Rect rect2 = Fighter2.Pushbox.Rect;
 
-			if (rect1.Overlaps(rect2)) {
-				if (Fighter1.Position.x < Fighter2.Position.x) {
-					Fighter1.ApplyPositionChange((rect1.xMax - rect2.xMin) * -1 / 2, Fighter1.Position.y);
-					Fighter2.ApplyPositionChange((rect1.xMax - rect2.xMin) * 1 / 2, Fighter2.Position.y);
-				} else if (Fighter1.Position.x > Fighter2.Position.x) {
-					Fighter1.ApplyPositionChange((rect2.xMax - rect1.xMin) * 1 / 2, Fighter1.Position.y);
-					Fighter2.ApplyPositionChange((rect2.xMax - rect1.xMin) * -1 / 2, Fighter1.Position.y);
-				}
+			if (!rect1.Overlaps(rect2)) { return; }
+
+			if (Fighter1.Position.x < Fighter2.Position.x) {
+				Fighter1.ApplyPositionChange((rect1.xMax - rect2.xMin) * -1 / 2, Fighter1.Position.y);
+				Fighter2.ApplyPositionChange((rect1.xMax - rect2.xMin) * 1 / 2, Fighter2.Position.y);
+			} else if (Fighter1.Position.x > Fighter2.Position.x) {
+				Fighter1.ApplyPositionChange((rect2.xMax - rect1.xMin) * 1 / 2, Fighter1.Position.y);
+				Fighter2.ApplyPositionChange((rect2.xMax - rect1.xMin) * -1 / 2, Fighter1.Position.y);
 			}
 		}
 
@@ -369,15 +387,13 @@ namespace Footsies {
 			float stageMinX = BattleAreaWidth * -1 / 2;
 			float stageMaxX = BattleAreaWidth / 2;
 
-			Fighters.ForEach(
-				fighter => {
-					if (fighter.Pushbox.XMin < stageMinX) {
-						fighter.ApplyPositionChange(stageMinX - fighter.Pushbox.XMin, fighter.Position.y);
-					} else if (fighter.Pushbox.XMax > stageMaxX) {
-						fighter.ApplyPositionChange(stageMaxX - fighter.Pushbox.XMax, fighter.Position.y);
-					}
+			foreach (Fighter fighter in Fighters) {
+				if (fighter.Pushbox.XMin < stageMinX) {
+					fighter.ApplyPositionChange(stageMinX - fighter.Pushbox.XMin, fighter.Position.y);
+				} else if (fighter.Pushbox.XMax > stageMaxX) {
+					fighter.ApplyPositionChange(stageMaxX - fighter.Pushbox.XMax, fighter.Position.y);
 				}
-			);
+			}
 		}
 
 		private void UpdateHitboxHurtboxCollision() {
@@ -439,39 +455,6 @@ namespace Footsies {
 			}
 		}
 
-		private void RecordInput(InputData p1Input, InputData p2Input) {
-			if (currentRecordingInputIndex >= MaxRecordingInputFrame) {
-				return;
-			}
-
-			recordingP1Input[currentRecordingInputIndex] = p1Input.ShallowCopy();
-			recordingP2Input[currentRecordingInputIndex] = p2Input.ShallowCopy();
-			currentRecordingInputIndex++;
-
-			if (isReplayingLastRoundInput) {
-				if (currentReplayingInputIndex < lastRoundMaxRecordingInput) {
-					currentReplayingInputIndex++;
-				}
-			}
-		}
-
-		private void CopyLastRoundInput() {
-			for (int i = 0; i < currentRecordingInputIndex; i++) {
-				lastRoundP1Input[i] = recordingP1Input[i].ShallowCopy();
-				lastRoundP2Input[i] = recordingP2Input[i].ShallowCopy();
-			}
-
-			lastRoundMaxRecordingInput = currentRecordingInputIndex;
-
-			isReplayingLastRoundInput = false;
-			currentReplayingInputIndex = 0;
-		}
-
-		private void StartPlayLastRoundInput() {
-			isReplayingLastRoundInput = true;
-			currentReplayingInputIndex = 0;
-		}
-
 		private bool CheckUpdateDebugPause() {
 			if (Input.GetKeyDown(KeyCode.F1)) {
 				isDebugPause = !isDebugPause;
@@ -489,6 +472,8 @@ namespace Footsies {
 			return false;
 		}
 
+		#endregion
+
 		public int GetFrameAdvantage(bool getP1) {
 			int p1FrameLeft = Fighter1.CurrentActionFrameCount - Fighter1.CurrentActionFrame;
 			if (Fighter1.IsAlwaysCancellable) {
@@ -500,11 +485,9 @@ namespace Footsies {
 				p2FrameLeft = 0;
 			}
 
-			if (getP1) {
-				return p2FrameLeft - p1FrameLeft;
-			} else {
-				return p1FrameLeft - p2FrameLeft;
-			}
+			return getP1
+				? p2FrameLeft - p1FrameLeft
+				: p1FrameLeft - p2FrameLeft;
 		}
 	}
 }
