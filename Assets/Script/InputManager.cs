@@ -22,15 +22,15 @@ namespace Footsies {
 		}
 
 		public class GamePadHelper {
-			public bool IsSet = false;
+			public bool IsSet;
 			public PlayerIndex PlayerIndex;
 			public GamePadState State;
 		}
 
 		public GamePadHelper[] gamePads = new GamePadHelper[2];
 
-		private int previousMenuInput = 0;
-		private int currentMenuInput = 0;
+		private int previousMenuInput;
+		private int currentMenuInput;
 
 		private float stickThreshold = 0.01f;
 
@@ -192,20 +192,13 @@ namespace Footsies {
 
 		private string GetInputName(Command command) {
 			switch (command) {
-				case Command.P1Left:
-					return "P1_Left";
-				case Command.P1Right:
-					return "P1_Right";
-				case Command.P1Attack:
-					return "P1_Attack";
-				case Command.P2Left:
-					return "P2_Left";
-				case Command.P2Right:
-					return "P2_Right";
-				case Command.P2Attack:
-					return "P2_Attack";
-				case Command.Cancel:
-					return "Cancel";
+				case Command.P1Left: return "P1_Left";
+				case Command.P1Right: return "P1_Right";
+				case Command.P1Attack: return "P1_Attack";
+				case Command.P2Left: return "P2_Left";
+				case Command.P2Right: return "P2_Right";
+				case Command.P2Attack: return "P2_Attack";
+				case Command.Cancel: return "Cancel";
 			}
 
 			return "";

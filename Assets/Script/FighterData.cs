@@ -18,7 +18,7 @@ namespace Footsies {
 
 		public int specialAttackHoldFrame = 60;
 
-		public bool canCancelOnWhiff = false;
+		public bool canCancelOnWhiff;
 
 		[SerializeField] public Rect baseHurtBoxRect;
 

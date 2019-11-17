@@ -24,7 +24,7 @@ namespace Footsies {
 	}
 
 	public class Hitbox : BoxBase {
-		public bool Proximity = false;
+		public bool Proximity;
 		public int AttackID;
 	}
 
@@ -104,7 +104,7 @@ namespace Footsies {
 		public int SpriteShakePosition { get; private set; }
 		private int maxSpriteShakeFrame = 6;
 
-		private bool hasWon = false;
+		private bool hasWon;
 
 		/// <summary>
 		/// Setup fighter at the start of battle
@@ -219,9 +219,8 @@ namespace Footsies {
 					RequestAction((int) CommonActionID.NSpecial);
 				}
 			} else if (isAttack) {
-				if ((CurrentActionID == (int) CommonActionID.NAttack ||
-				     CurrentActionID == (int) CommonActionID.BAttack) &&
-				    !IsActionEnd) {
+				if ((CurrentActionID == (int) CommonActionID.NAttack || CurrentActionID == (int) CommonActionID.BAttack)
+				    && !IsActionEnd) {
 					RequestAction((int) CommonActionID.NSpecial);
 				} else {
 					if (isBackward || isForward) {
@@ -335,8 +334,11 @@ namespace Footsies {
 				if (isGuardBreak) {
 					SetCurrentAction(attackData.guardActionID);
 					reserveDamageActionID = (int) CommonActionID.GuardBreak;
-					SoundManager.Instance.PlayFighterSE(fighterData.Actions[reserveDamageActionID].audioClip,
-						IsFaceRight, Position.x);
+					SoundManager.Instance.PlayFighterSE(
+						fighterData.Actions[reserveDamageActionID].audioClip,
+						IsFaceRight,
+						Position.x
+					);
 					return DamageResult.GuardBreak;
 				} else {
 					SetCurrentAction(attackData.guardActionID);
@@ -363,7 +365,7 @@ namespace Footsies {
 
 		public bool CanAttackHit(int attackID) {
 			if (!fighterData.AttackData.ContainsKey(attackID)) {
-				Debug.LogWarning("Attack hit but AttackID=" + attackID + " is not registered");
+				Debug.LogWarning($"Attack hit but AttackID={attackID} is not registered");
 				return true;
 			}
 
@@ -376,7 +378,7 @@ namespace Footsies {
 
 		public AttackData GetAttackData(int attackID) {
 			if (!fighterData.AttackData.ContainsKey(attackID)) {
-				Debug.LogWarning("Attack hit but AttackID=" + attackID + " is not registered");
+				Debug.LogWarning($"Attack hit but AttackID={attackID} is not registered");
 				return null;
 			}
 
@@ -495,8 +497,11 @@ namespace Footsies {
 					return;
 				}
 
-				SoundManager.Instance.PlayFighterSE(fighterData.Actions[CurrentActionID].audioClip, IsFaceRight,
-					Position.x);
+				SoundManager.Instance.PlayFighterSE(
+					fighterData.Actions[CurrentActionID].audioClip,
+					IsFaceRight,
+					Position.x
+				);
 			}
 		}
 

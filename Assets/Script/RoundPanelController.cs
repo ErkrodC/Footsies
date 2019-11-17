@@ -23,7 +23,7 @@ namespace Footsies {
 		private BattleCore battleCore;
 		private Image[] roundWonImages;
 
-		private uint currentRoundWon = 0;
+		private uint currentRoundWon;
 
 		#endregion
 

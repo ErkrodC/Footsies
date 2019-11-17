@@ -25,7 +25,7 @@ namespace Footsies {
 
 		[SerializeField] private GUIStyle debugTextStyle;
 
-		[SerializeField] private bool drawDebug = false;
+		[SerializeField] private bool drawDebug;
 
 		#endregion
 
@@ -93,8 +93,12 @@ namespace Footsies {
 			if (drawDebug) {
 				battleCore.Fighters.ForEach((f) => DrawFighter(f));
 
-				Rect labelRect = new Rect(Screen.width * 0.4f, Screen.height * 0.95f, Screen.width * 0.2f,
-					Screen.height * 0.05f);
+				Rect labelRect = new Rect(
+					Screen.width * 0.4f,
+					Screen.height * 0.95f,
+					Screen.width * 0.2f,
+					Screen.height * 0.05f
+				);
 				debugTextStyle.alignment = TextAnchor.UpperCenter;
 				GUI.Label(labelRect, "F1=Pause/Resume, F2=Frame Step, F12=Debug Draw", debugTextStyle);
 
@@ -114,8 +118,8 @@ namespace Footsies {
 				}
 
 				Vector3 position = fighter1Image.transform.position;
-				position.x = TransformHorizontalFightPointToScreen(battleCore.Fighter1.Position.x) +
-				             battleCore.Fighter1.SpriteShakePosition;
+				position.x = TransformHorizontalFightPointToScreen(battleCore.Fighter1.Position.x)
+				             + battleCore.Fighter1.SpriteShakePosition;
 				fighter1Image.transform.position = position;
 			}
 
@@ -126,8 +130,8 @@ namespace Footsies {
 				}
 
 				Vector3 position = fighter2Image.transform.position;
-				position.x = TransformHorizontalFightPointToScreen(battleCore.Fighter2.Position.x) +
-				             battleCore.Fighter2.SpriteShakePosition;
+				position.x = TransformHorizontalFightPointToScreen(battleCore.Fighter2.Position.x)
+				             + battleCore.Fighter2.SpriteShakePosition;
 				fighter2Image.transform.position = position;
 			}
 		}
@@ -146,16 +150,22 @@ namespace Footsies {
 
 			labelRect.y += Screen.height * 0.03f;
 			int frameAdvantage = battleCore.GetFrameAdvantage(fighter.IsFaceRight);
-			string frameAdvText = frameAdvantage > 0 ? "+" + frameAdvantage : frameAdvantage.ToString();
-			GUI.Label(labelRect, "Frame: " + fighter.CurrentActionFrame + "/" + fighter.CurrentActionFrameCount
-			                     + "(" + frameAdvText + ")", debugTextStyle);
+			string frameAdvText = frameAdvantage > 0 ? $"+{frameAdvantage}" : frameAdvantage.ToString();
+			GUI.Label(
+				labelRect,
+				$"Frame: {fighter.CurrentActionFrame}/{fighter.CurrentActionFrameCount}({frameAdvText})",
+				debugTextStyle
+			);
 
 			labelRect.y += Screen.height * 0.03f;
-			GUI.Label(labelRect, "Stun: " + fighter.CurrentHitStunFrame, debugTextStyle);
+			GUI.Label(labelRect, $"Stun: {fighter.CurrentHitStunFrame}", debugTextStyle);
 
 			labelRect.y += Screen.height * 0.03f;
-			GUI.Label(labelRect, "Action: " + fighter.CurrentActionID + " " + (CommonActionID) fighter.CurrentActionID,
-				debugTextStyle);
+			GUI.Label(
+				labelRect,
+				$"Action: {fighter.CurrentActionID} {(CommonActionID) fighter.CurrentActionID}",
+				debugTextStyle
+			);
 
 			foreach (Hurtbox hurtbox in fighter.Hurtboxes) {
 				DrawFightBox(hurtbox.Rect, Color.yellow, true);
@@ -179,8 +189,9 @@ namespace Footsies {
 			screenRect.width = fightPointRect.width * fightPointToScreenScale.x;
 			screenRect.height = fightPointRect.height * fightPointToScreenScale.y;
 			screenRect.x = TransformHorizontalFightPointToScreen(fightPointRect.x) - screenRect.width / 2;
-			screenRect.y = battleAreaBottomRightPoint.y - fightPointRect.y * fightPointToScreenScale.y -
-			               screenRect.height;
+			screenRect.y = battleAreaBottomRightPoint.y
+			               - fightPointRect.y * fightPointToScreenScale.y
+			               - screenRect.height;
 
 			DrawBox(screenRect, color, isFilled);
 		}
@@ -223,8 +234,8 @@ namespace Footsies {
 		private void CalculateFightPointToScreenScale() {
 			fightPointToScreenScale.x =
 				(battleAreaBottomRightPoint.x - battleAreaTopLeftPoint.x) / battleCore.BattleAreaWidth;
-			fightPointToScreenScale.y = (battleAreaBottomRightPoint.y - battleAreaTopLeftPoint.y) /
-			                            battleCore.BattleAreaMaxHeight;
+			fightPointToScreenScale.y = (battleAreaBottomRightPoint.y - battleAreaTopLeftPoint.y)
+			                            / battleCore.BattleAreaMaxHeight;
 
 			centerPoint = (battleAreaBottomRightPoint.x + battleAreaTopLeftPoint.x) / 2;
 		}

@@ -17,7 +17,7 @@ namespace Footsies {
 
 		private BattleCore battleCore;
 
-		private int currentGuardHealth = 0;
+		private int currentGuardHealth;
 
 		#endregion
 

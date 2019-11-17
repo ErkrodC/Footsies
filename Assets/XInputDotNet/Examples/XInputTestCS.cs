@@ -3,7 +3,7 @@ using XInputDotNetPure; // Required in C#
 
 public class XInputTestCS : MonoBehaviour
 {
-    bool playerIndexSet = false;
+    bool playerIndexSet;
     PlayerIndex playerIndex;
     GamePadState state;
     GamePadState prevState;

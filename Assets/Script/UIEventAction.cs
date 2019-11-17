@@ -37,8 +37,7 @@ namespace Footsies {
 				case Action.BGMToggle:
 					ToggleBGM();
 					break;
-				case Action.SEToggle:
-					break;
+				case Action.SEToggle: break;
 			}
 		}
 
