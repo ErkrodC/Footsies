@@ -54,7 +54,7 @@ namespace Footsies {
 
 			if (_battleCoreGameObject != null) {
 				battleCore = _battleCoreGameObject.GetComponent<BattleCore>();
-				battleCore.damageHandler += OnDamageHandler;
+				battleCore.DamageOccurred += OnDamageOccurred;
 			}
 
 			if (fighter1ImageObject != null) {
@@ -75,7 +75,7 @@ namespace Footsies {
 		}
 
 		private void OnDestroy() {
-			battleCore.damageHandler -= OnDamageHandler;
+			battleCore.DamageOccurred -= OnDamageOccurred;
 		}
 
 		private void FixedUpdate() {
@@ -91,7 +91,9 @@ namespace Footsies {
 
 		private void OnGUI() {
 			if (drawDebug) {
-				battleCore.Fighters.ForEach((f) => DrawFighter(f));
+				foreach (Fighter f in battleCore.Fighters) {
+					DrawFighter(f);
+				}
 
 				Rect labelRect = new Rect(
 					Screen.width * 0.4f,
@@ -240,7 +242,7 @@ namespace Footsies {
 			centerPoint = (battleAreaBottomRightPoint.x + battleAreaTopLeftPoint.x) / 2;
 		}
 
-		private void OnDamageHandler(Fighter damagedFighter, Vector2 damagedPos, DamageResult damageResult) {
+		private void OnDamageOccurred(Fighter damagedFighter, Vector2 damagedPos, DamageResult damageResult) {
 			// Set attacker fighter to last sibling so that it will get draw last and be on the most front
 			if (damagedFighter == battleCore.Fighter1) {
 				fighter2Image.transform.SetAsLastSibling();

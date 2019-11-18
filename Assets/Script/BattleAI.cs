@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Footsies {
 	public class BattleAI {
-		public class FightState {
+		private class FightState {
 			public float DistanceX;
 			public bool IsOpponentDamage;
 			public bool IsOpponentGuardBreak;
@@ -32,7 +32,7 @@ namespace Footsies {
 			UpdateFightState();
 			FightState fightState = GetCurrentFightState();
 			if (fightState != null) {
-				//Debug.Log(fightState.distanceX);
+				//Globals.Logger.Log(fightState.distanceX);
 				if (moveQueue.Count > 0) {
 					input |= moveQueue.Dequeue();
 				} else if (moveQueue.Count == 0) {
@@ -165,7 +165,7 @@ namespace Footsies {
 				moveQueue.Enqueue(0);
 			}
 
-			Debug.Log("AddNeutral");
+			Globals.Logger.Log("AddNeutral");
 		}
 
 		private void AddFarApproach1() {
@@ -174,7 +174,7 @@ namespace Footsies {
 			AddForwardInputQueue(30);
 			AddBackwardInputQueue(10);
 
-			Debug.Log("AddFarApproach1");
+			Globals.Logger.Log("AddFarApproach1");
 		}
 
 		private void AddFarApproach2() {
@@ -183,7 +183,7 @@ namespace Footsies {
 			AddForwardDashInputQueue();
 			AddBackwardInputQueue(25);
 
-			Debug.Log("AddFarApproach2");
+			Globals.Logger.Log("AddFarApproach2");
 		}
 
 		private void AddMidApproach1() {
@@ -192,27 +192,27 @@ namespace Footsies {
 			AddForwardInputQueue(20);
 			AddBackwardInputQueue(10);
 
-			Debug.Log("AddMidApproach1");
+			Globals.Logger.Log("AddMidApproach1");
 		}
 
 		private void AddMidApproach2() {
 			AddForwardDashInputQueue();
 			AddBackwardInputQueue(30);
 
-			Debug.Log("AddMidApproach2");
+			Globals.Logger.Log("AddMidApproach2");
 		}
 
 		private void AddFallBack1() {
 			AddBackwardInputQueue(60);
 
-			Debug.Log("AddFallBack1");
+			Globals.Logger.Log("AddFallBack1");
 		}
 
 		private void AddFallBack2() {
 			AddBackwardDashInputQueue();
 			AddBackwardInputQueue(60);
 
-			Debug.Log("AddFallBack2");
+			Globals.Logger.Log("AddFallBack2");
 		}
 
 		private void AddNoAttack() {
@@ -220,7 +220,7 @@ namespace Footsies {
 				attackQueue.Enqueue(0);
 			}
 
-			Debug.Log("AddNoAttack");
+			Globals.Logger.Log("AddNoAttack");
 		}
 
 		private void AddOneHitImmediateAttack() {
@@ -229,7 +229,7 @@ namespace Footsies {
 				attackQueue.Enqueue(0);
 			}
 
-			Debug.Log("AddOneHitImmediateAttack");
+			Globals.Logger.Log("AddOneHitImmediateAttack");
 		}
 
 		private void AddTwoHitImmediateAttack() {
@@ -243,7 +243,7 @@ namespace Footsies {
 				attackQueue.Enqueue(0);
 			}
 
-			Debug.Log("AddTwoHitImmediateAttack");
+			Globals.Logger.Log("AddTwoHitImmediateAttack");
 		}
 
 		private void AddImmediateSpecialAttack() {
@@ -253,7 +253,7 @@ namespace Footsies {
 
 			attackQueue.Enqueue(0);
 
-			Debug.Log("AddImmediateSpecialAttack");
+			Globals.Logger.Log("AddImmediateSpecialAttack");
 		}
 
 		private void AddDelaySpecialAttack() {
@@ -263,7 +263,7 @@ namespace Footsies {
 
 			attackQueue.Enqueue(0);
 
-			Debug.Log("AddDelaySpecialAttack");
+			Globals.Logger.Log("AddDelaySpecialAttack");
 		}
 
 		private void AddForwardInputQueue(int frame) {
@@ -292,17 +292,23 @@ namespace Footsies {
 
 		private void UpdateFightState() {
 			FightState currentFightState = new FightState();
+			
 			currentFightState.DistanceX = GetDistanceX();
+			
 			currentFightState.IsOpponentDamage = battleCore.Fighter1.CurrentActionID == (int) CommonActionID.Damage;
+			
 			currentFightState.IsOpponentGuardBreak =
 				battleCore.Fighter1.CurrentActionID == (int) CommonActionID.GuardBreak;
+			
 			currentFightState.IsOpponentBlocking =
 				battleCore.Fighter1.CurrentActionID == (int) CommonActionID.GuardCrouch
 				|| battleCore.Fighter1.CurrentActionID == (int) CommonActionID.GuardStand
 				|| battleCore.Fighter1.CurrentActionID == (int) CommonActionID.GuardM;
+			
 			currentFightState.IsOpponentNormalAttack =
 				battleCore.Fighter1.CurrentActionID == (int) CommonActionID.NAttack
 				|| battleCore.Fighter1.CurrentActionID == (int) CommonActionID.BAttack;
+			
 			currentFightState.IsOpponentSpecialAttack =
 				battleCore.Fighter1.CurrentActionID == (int) CommonActionID.NSpecial
 				|| battleCore.Fighter1.CurrentActionID == (int) CommonActionID.BSpecial;

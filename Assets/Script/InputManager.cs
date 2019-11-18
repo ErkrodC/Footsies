@@ -132,7 +132,7 @@ namespace Footsies {
 
 						GamePadState testState = GamePad.GetState(testPlayerIndex);
 						if (testState.IsConnected) {
-							Debug.Log(string.Format("Set pad {0} to player {1}", testPlayerIndex, i + 1));
+							Globals.Logger.Log($"Set pad {testPlayerIndex} to player {i + 1}");
 							gamePads[i].PlayerIndex = testPlayerIndex;
 							gamePads[i].IsSet = true;
 							gamePads[i].State = GamePad.GetState(testPlayerIndex);

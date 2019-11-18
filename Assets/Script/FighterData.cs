@@ -44,10 +44,10 @@ namespace Footsies {
 
 		public void SetupDictionary() {
 			if (actionDataContainer == null) {
-				Debug.LogError("ActionDataContainer is not set");
+				Globals.Logger.LogError("ActionDataContainer is not set");
 				return;
 			} else if (attackDataContainer == null) {
-				Debug.LogError("ActionDataContainer is not set");
+				Globals.Logger.LogError("ActionDataContainer is not set");
 				return;
 			}
 

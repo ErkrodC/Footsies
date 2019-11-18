@@ -115,7 +115,7 @@ namespace Footsies {
 			input[0] = inputData.Input;
 			inputDown[0] = (input[0] ^ input[1]) & input[0];
 			inputUp[0] = (input[0] ^ input[1]) & ~input[0];
-			//Debug.Log(System.Convert.ToString(input[0], 2) + " " + System.Convert.ToString(inputDown[0], 2) + " " + System.Convert.ToString(inputUp[0], 2));
+			//Globals.Logger.Log(System.Convert.ToString(input[0], 2) + " " + System.Convert.ToString(inputDown[0], 2) + " " + System.Convert.ToString(inputUp[0], 2));
 		}
 
 		/// <summary>
@@ -310,7 +310,7 @@ namespace Footsies {
 
 		public bool CanAttackHit(int attackID) {
 			if (!fighterData.AttackData.ContainsKey(attackID)) {
-				Debug.LogWarning($"Attack hit but AttackID={attackID} is not registered");
+				Globals.Logger.LogWarning($"Attack hit but AttackID={attackID} is not registered");
 				return true;
 			}
 
@@ -323,7 +323,7 @@ namespace Footsies {
 
 		public AttackData GetAttackData(int attackID) {
 			if (!fighterData.AttackData.ContainsKey(attackID)) {
-				Debug.LogWarning($"Attack hit but AttackID={attackID} is not registered");
+				Globals.Logger.LogWarning($"Attack hit but AttackID={attackID} is not registered");
 				return null;
 			}
 
@@ -437,7 +437,7 @@ namespace Footsies {
 			reserveDamageActionID = -1;
 			SpriteShakePosition = 0;
 
-			if (fighterData.Actions[CurrentActionID].audioClip != null) {
+			if (fighterData.Actions[CurrentActionID].audioClip) {
 				if (CurrentActionID == (int) CommonActionID.GuardBreak) {
 					return;
 				}
