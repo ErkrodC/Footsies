@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -18,18 +19,18 @@ MonoBehaviour:
   isLoop: 0
   loopFromFrame: 0
   motions:
-  - startEndFrame: {x: 0, y: 10}
+  - StartEndFrame: {x: 0, y: 10}
     motionID: 40
-  - startEndFrame: {x: 11, y: 16}
+  - StartEndFrame: {x: 11, y: 16}
     motionID: 41
-  - startEndFrame: {x: 17, y: 20}
+  - StartEndFrame: {x: 17, y: 20}
     motionID: 42
-  - startEndFrame: {x: 21, y: 21}
+  - StartEndFrame: {x: 21, y: 21}
     motionID: 43
   status: []
   hitboxes: []
   hurtboxes:
-  - startEndFrame: {x: 4, y: 21}
+  - StartEndFrame: {x: 4, y: 21}
     rect:
       serializedVersion: 2
       x: 0
@@ -38,7 +39,7 @@ MonoBehaviour:
       height: 1.2
     useBaseRect: 0
   pushboxes:
-  - startEndFrame: {x: 0, y: 21}
+  - StartEndFrame: {x: 0, y: 21}
     rect:
       serializedVersion: 2
       x: 0
@@ -47,15 +48,15 @@ MonoBehaviour:
       height: 1
     useBaseRect: 0
   movements:
-  - startEndFrame: {x: 0, y: 2}
+  - StartEndFrame: {x: 0, y: 2}
     velocity_x: -10
-  - startEndFrame: {x: 3, y: 8}
+  - StartEndFrame: {x: 3, y: 8}
     velocity_x: -5
-  - startEndFrame: {x: 9, y: 12}
+  - StartEndFrame: {x: 9, y: 12}
     velocity_x: -3
-  - startEndFrame: {x: 13, y: 14}
+  - StartEndFrame: {x: 13, y: 14}
     velocity_x: -1
-  - startEndFrame: {x: 15, y: 15}
+  - StartEndFrame: {x: 15, y: 15}
     velocity_x: 0
   cancels: []
   alwaysCancelable: 0

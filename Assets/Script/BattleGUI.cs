@@ -113,9 +113,9 @@ namespace Footsies {
 		}
 
 		private void UpdateSprite() {
-			if (fighter1Image != null) {
+			if (fighter1Image) {
 				Sprite sprite = battleCore.Fighter1.GetCurrentMotionSprite();
-				if (sprite != null) {
+				if (sprite) {
 					fighter1Image.sprite = sprite;
 				}
 
@@ -125,9 +125,9 @@ namespace Footsies {
 				fighter1Image.transform.position = position;
 			}
 
-			if (fighter2Image != null) {
+			if (fighter2Image) {
 				Sprite sprite = battleCore.Fighter2.GetCurrentMotionSprite();
-				if (sprite != null) {
+				if (sprite) {
 					fighter2Image.sprite = sprite;
 				}
 

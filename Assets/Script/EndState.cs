@@ -2,11 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Footsies {
-	public class EndState : IState {
+	public class EndState : State {
 		private const float kEndStateTime = 3f;
 		private const float kEndStateSkippableTime = 1.5f;
-		
-		public StateMachine StateMachine { get; set; }
 
 		private readonly BattleCore battleCore;
 
@@ -14,7 +12,7 @@ namespace Footsies {
 			this.battleCore = battleCore;
 		}
 
-		public void OnEnter() {
+		public override void OnEnter() {
 			battleCore.Timer = kEndStateTime;
 
 			List<Fighter> deadFighter = battleCore.Fighters.FindAll((f) => f.IsDead);
@@ -29,17 +27,13 @@ namespace Footsies {
 			}
 		}
 
-		public void Tick() {
+		public override void Tick() {
 			UpdateEndState();
 
 			battleCore.Timer -= Time.deltaTime;
 			if (battleCore.Timer <= 0f || battleCore.Timer <= kEndStateSkippableTime && IsKOSkipButtonPressed()) {
 				StateMachine.SetState<StopState>();
 			}
-		}
-
-		public void OnExit() {
-			throw new System.NotImplementedException();
 		}
 
 		private static bool IsKOSkipButtonPressed() {

@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -15,21 +16,23 @@ MonoBehaviour:
   actionName: STAND
   Type: 0
   frameCount: 24
+  isLoop: 0
+  loopFromFrame: 0
   motions:
-  - startEndFrame: {x: 0, y: 5}
+  - StartEndFrame: {x: 0, y: 5}
     motionID: 0
-  - startEndFrame: {x: 6, y: 8}
+  - StartEndFrame: {x: 6, y: 8}
     motionID: 1
-  - startEndFrame: {x: 9, y: 14}
+  - StartEndFrame: {x: 9, y: 14}
     motionID: 2
-  - startEndFrame: {x: 15, y: 20}
+  - StartEndFrame: {x: 15, y: 20}
     motionID: 3
-  - startEndFrame: {x: 21, y: 23}
+  - StartEndFrame: {x: 21, y: 23}
     motionID: 4
   status: []
   hitboxes: []
   hurtboxes:
-  - startEndFrame: {x: 0, y: 59}
+  - StartEndFrame: {x: 0, y: 59}
     rect:
       serializedVersion: 2
       x: 0
@@ -38,7 +41,7 @@ MonoBehaviour:
       height: 1.2
     useBaseRect: 1
   pushboxes:
-  - startEndFrame: {x: 0, y: 59}
+  - StartEndFrame: {x: 0, y: 59}
     rect:
       serializedVersion: 2
       x: 0
@@ -49,3 +52,4 @@ MonoBehaviour:
   movements: []
   cancels: []
   alwaysCancelable: 1
+  audioClip: {fileID: 0}

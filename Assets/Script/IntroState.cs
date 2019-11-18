@@ -1,12 +1,9 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Footsies {
-	public class IntroState : IState {
+	public class IntroState : State {
 		private const float kIntroStateTime = 3f;
 		private static readonly int roundStart = Animator.StringToHash("RoundStart");
-		
-		public StateMachine StateMachine { get; set; }
 
 		private readonly BattleCore battleCore;
 		
@@ -14,7 +11,11 @@ namespace Footsies {
 			this.battleCore = battleCore;
 		}
 		
-		public void OnEnter() {
+		public override void OnEnter() {
+			if (GameManager.Instance.IsVsCPU) {
+				battleCore.BattleAI = new BattleAI(battleCore);
+			}
+			
 			battleCore.Fighter1.SetupBattleStart(battleCore.FighterDataList[0], new Vector2(-2f, 0f), true);
 			battleCore.Fighter2.SetupBattleStart(battleCore.FighterDataList[0], new Vector2(2f, 0f), false);
 
@@ -23,7 +24,7 @@ namespace Footsies {
 			battleCore.RoundUIAnimator.SetTrigger(roundStart);
 		}
 
-		public void Tick() {
+		public override void Tick() {
 			InputData p1Input = battleCore.GetP1InputData();
 			InputData p2Input = battleCore.GetP2InputData();
 			battleCore.RecordInput(p1Input, p2Input);
@@ -49,10 +50,6 @@ namespace Footsies {
 			    && !battleCore.IsReplayingLastRoundInput) {
 				StartPlayLastRoundInput();
 			}
-		}
-
-		public void OnExit() {
-			throw new System.NotImplementedException();
 		}
 		
 		private void StartPlayLastRoundInput() {

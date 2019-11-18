@@ -2,10 +2,8 @@ using System;
 using UnityEngine;
 
 namespace Footsies {
-	public class FightState : IState {
+	public class FightState : State {
 		public event Action<Fighter, Vector2, DamageResult> DamageOccurred;
-		
-		public StateMachine StateMachine { get; set; }
 		
 		private int frameCount;
 		private bool isDebugPause;
@@ -15,14 +13,14 @@ namespace Footsies {
 			this.battleCore = battleCore;
 		}
 		
-		public void OnEnter() {
+		public override void OnEnter() {
 			battleCore.RoundStartTime = Time.fixedTime;
 			frameCount = -1;
 
 			battleCore.CurrentRecordingInputIndex = 0;
 		}
 
-		public void Tick() {
+		public override void Tick() {
 			if (CheckUpdateDebugPause()) {
 				return;
 			}
@@ -35,10 +33,6 @@ namespace Footsies {
 			if (deadFighter != null) {
 				StateMachine.SetState<KOState>();
 			}
-		}
-
-		public void OnExit() {
-			throw new System.NotImplementedException();
 		}
 		
 		private bool CheckUpdateDebugPause() {

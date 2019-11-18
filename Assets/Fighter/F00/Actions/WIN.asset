@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -18,26 +19,26 @@ MonoBehaviour:
   isLoop: 1
   loopFromFrame: 5
   motions:
-  - startEndFrame: {x: 0, y: 4}
+  - StartEndFrame: {x: 0, y: 4}
     motionID: 200
-  - startEndFrame: {x: 5, y: 8}
+  - StartEndFrame: {x: 5, y: 8}
     motionID: 201
-  - startEndFrame: {x: 9, y: 12}
+  - StartEndFrame: {x: 9, y: 12}
     motionID: 202
-  - startEndFrame: {x: 13, y: 16}
+  - StartEndFrame: {x: 13, y: 16}
     motionID: 203
-  - startEndFrame: {x: 17, y: 20}
+  - StartEndFrame: {x: 17, y: 20}
     motionID: 204
-  - startEndFrame: {x: 21, y: 24}
+  - StartEndFrame: {x: 21, y: 24}
     motionID: 205
-  - startEndFrame: {x: 25, y: 28}
+  - StartEndFrame: {x: 25, y: 28}
     motionID: 206
-  - startEndFrame: {x: 29, y: 32}
+  - StartEndFrame: {x: 29, y: 32}
     motionID: 207
   status: []
   hitboxes: []
   hurtboxes:
-  - startEndFrame: {x: 0, y: 32}
+  - StartEndFrame: {x: 0, y: 32}
     rect:
       serializedVersion: 2
       x: 0
@@ -46,7 +47,7 @@ MonoBehaviour:
       height: 0
     useBaseRect: 1
   pushboxes:
-  - startEndFrame: {x: 0, y: 32}
+  - StartEndFrame: {x: 0, y: 32}
     rect:
       serializedVersion: 2
       x: 0
@@ -57,3 +58,4 @@ MonoBehaviour:
   movements: []
   cancels: []
   alwaysCancelable: 0
+  audioClip: {fileID: 0}

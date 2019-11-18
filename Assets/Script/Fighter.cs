@@ -213,19 +213,20 @@ namespace Footsies {
 
 			// Position changes from walking forward and backward
 			int sign = IsFaceRight ? 1 : -1;
-			if (CurrentActionID == (int) CommonActionID.Forward) {
-				Position.x += fighterData.forwardMoveSpeed * sign * Time.deltaTime;
-				return;
-			} else if (CurrentActionID == (int) CommonActionID.Backward) {
-				Position.x -= fighterData.backwardMoveSpeed * sign * Time.deltaTime;
-				return;
+			switch (CurrentActionID) {
+				case (int) CommonActionID.Forward:
+					Position.x += fighterData.forwardMoveSpeed * sign * Time.deltaTime;
+					return;
+				case (int) CommonActionID.Backward:
+					Position.x -= fighterData.backwardMoveSpeed * sign * Time.deltaTime;
+					return;
 			}
 
 			// Position changes from action data
 			MovementData movementData = fighterData.Actions[CurrentActionID].GetMovementData(CurrentActionFrame);
 			if (movementData != null) {
 				velocityX = movementData.velocity_x;
-				if (velocityX != 0) {
+				if (!Mathf.Approximately(velocityX, 0)) {
 					Position.x += velocityX * sign * Time.deltaTime;
 				}
 			}
@@ -398,11 +399,7 @@ namespace Footsies {
 
 		public Sprite GetCurrentMotionSprite() {
 			MotionFrameData motionData = fighterData.Actions[CurrentActionID].GetMotionData(CurrentActionFrame);
-			if (motionData == null) {
-				return null;
-			}
-
-			return fighterData.MotionData[motionData.motionID].sprite;
+			return motionData == null ? null : fighterData.MotionData[motionData.motionID].sprite;
 		}
 
 		public void ClearInput() {
@@ -516,24 +513,20 @@ namespace Footsies {
 			return false;
 		}
 
-		private bool IsAttackInput(int input) {
+		private static bool IsAttackInput(int input) {
 			return (input & (int) InputDefine.Attack) > 0;
 		}
 
 		private bool IsForwardInput(int input) {
-			if (IsFaceRight) {
-				return (input & (int) InputDefine.Right) > 0;
-			} else {
-				return (input & (int) InputDefine.Left) > 0;
-			}
+			return IsFaceRight
+				? (input & (int) InputDefine.Right) > 0
+				: (input & (int) InputDefine.Left) > 0;
 		}
 
 		private bool IsBackwardInput(int input) {
-			if (IsFaceRight) {
-				return (input & (int) InputDefine.Left) > 0;
-			} else {
-				return (input & (int) InputDefine.Right) > 0;
-			}
+			return IsFaceRight
+				? (input & (int) InputDefine.Left) > 0
+				: (input & (int) InputDefine.Right) > 0;
 		}
 
 		/// <summary>
@@ -544,10 +537,12 @@ namespace Footsies {
 			Hurtboxes.Clear();
 
 			foreach (HitboxData hitbox in fighterData.Actions[CurrentActionID].GetHitboxData(CurrentActionFrame)) {
-				Hitbox box = new Hitbox();
-				box.Rect = TransformToFightRect(hitbox.rect, Position, IsFaceRight);
-				box.Proximity = hitbox.proximity;
-				box.AttackID = hitbox.attackID;
+				Hitbox box = new Hitbox {
+					Rect = TransformToFightRect(hitbox.rect, Position, IsFaceRight),
+					Proximity = hitbox.proximity,
+					AttackID = hitbox.attackID
+				};
+				
 				Hitboxes.Add(box);
 			}
 
@@ -559,9 +554,11 @@ namespace Footsies {
 			}
 
 			PushboxData pushBoxData = fighterData.Actions[CurrentActionID].GetPushboxData(CurrentActionFrame);
-			Pushbox = new Pushbox();
-			Rect pushRect = pushBoxData.useBaseRect ? fighterData.basePushBoxRect : pushBoxData.rect;
-			Pushbox.Rect = TransformToFightRect(pushRect, Position, IsFaceRight);
+			if (pushBoxData != null) {
+				Pushbox = new Pushbox();
+				Rect pushRect = pushBoxData.useBaseRect ? fighterData.basePushBoxRect : pushBoxData.rect;
+				Pushbox.Rect = TransformToFightRect(pushRect, Position, IsFaceRight);
+			}
 		}
 
 		/// <summary>
@@ -571,14 +568,15 @@ namespace Footsies {
 		/// <param name="basePosition"></param>
 		/// <param name="isFaceRight"></param>
 		/// <returns></returns>
-		private Rect TransformToFightRect(Rect dataRect, Vector2 basePosition, bool isFaceRight) {
+		private static Rect TransformToFightRect(Rect dataRect, Vector2 basePosition, bool isFaceRight) {
 			int sign = isFaceRight ? 1 : -1;
 
-			Rect fightPosRect = new Rect();
-			fightPosRect.x = basePosition.x + dataRect.x * sign;
-			fightPosRect.y = basePosition.y + dataRect.y;
-			fightPosRect.width = dataRect.width;
-			fightPosRect.height = dataRect.height;
+			Rect fightPosRect = new Rect {
+				x = basePosition.x + dataRect.x * sign,
+				y = basePosition.y + dataRect.y,
+				width = dataRect.width,
+				height = dataRect.height
+			};
 
 			return fightPosRect;
 		}

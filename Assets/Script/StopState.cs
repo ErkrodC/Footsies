@@ -1,8 +1,6 @@
 namespace Footsies {
-	public class StopState : IState {
+	public class StopState : State {
 		private const uint kMaxRoundWon = 3;
-		
-		public StateMachine StateMachine { get; set; }
 
 		private readonly BattleCore battleCore;
 
@@ -10,19 +8,13 @@ namespace Footsies {
 			this.battleCore = battleCore;
 		}
 		
-		public void OnEnter() {
+		public override void OnEnter() {
 			if (battleCore.Fighter1RoundWon >= kMaxRoundWon
 			    || battleCore.Fighter2RoundWon >= kMaxRoundWon) {
 				GameManager.Instance.LoadTitleScene();
 			}
-		}
-
-		public void Tick() { 
+			
 			StateMachine.SetState<IntroState>();
-		}
-
-		public void OnExit() {
-			throw new System.NotImplementedException();
 		}
 	}
 }

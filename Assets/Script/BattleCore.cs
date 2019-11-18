@@ -54,10 +54,6 @@ namespace Footsies {
 		#region Monobehaviour
 
 		private void Awake() {
-			if (GameManager.Instance.IsVsCPU) { // TODO check this
-				BattleAI = new BattleAI(this);
-			}
-			
 			// Setup dictionary from ScriptableObject data
 			foreach (FighterData data in FighterDataList) {
 				data.SetupDictionary();
@@ -79,11 +75,18 @@ namespace Footsies {
 			stateMachine = new StateMachine();
 			stateMachine.AddState(new StopState(this));
 			stateMachine.AddState(new IntroState(this));
+
+			FightState fightState = new FightState(this);
+			fightState.DamageOccurred += (damaged, damagePos, damageResult) => DamageOccurred?.Invoke(damaged, damagePos, damageResult); // TODO refactor this
 			stateMachine.AddState(new FightState(this));
 			stateMachine.AddState(new KOState(this));
 			stateMachine.AddState(new EndState(this));
 			
 			stateMachine.SetState<StopState>();
+		}
+
+		private void FixedUpdate() {
+			stateMachine.Tick();
 		}
 
 		#endregion

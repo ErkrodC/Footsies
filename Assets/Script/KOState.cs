@@ -1,11 +1,9 @@
 using UnityEngine;
 
 namespace Footsies {
-	public class KOState : IState {
+	public class KOState : State {
 		private const float kKOStateTime = 2f;
 		private static readonly int roundEnd = Animator.StringToHash("RoundEnd");
-		
-		public StateMachine StateMachine { get; set; }
 
 		private readonly BattleCore battleCore;
 
@@ -13,7 +11,7 @@ namespace Footsies {
 			this.battleCore = battleCore;
 		}
 		
-		public void OnEnter() {
+		public override void OnEnter() {
 			battleCore.Timer = kKOStateTime;
 
 			CopyLastRoundInput();
@@ -26,15 +24,11 @@ namespace Footsies {
 			battleCore.RoundUIAnimator.SetTrigger(roundEnd);
 		}
 
-		public void Tick() {
+		public override void Tick() {
 			battleCore.Timer -= Time.deltaTime;
 			if (battleCore.Timer <= 0f) {
 				StateMachine.SetState<EndState>();
 			}
-		}
-
-		public void OnExit() {
-			throw new System.NotImplementedException();
 		}
 		
 		private void CopyLastRoundInput() {

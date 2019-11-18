@@ -6,20 +6,21 @@ namespace Footsies {
         // TODO is this needed?
         private static readonly List<StateChangedStackItem> onStateChangedStack = new List<StateChangedStackItem>();
         
-        public event Action<IState> OnStateChanged = delegate{};
+        public event Action<State> OnStateChanged = delegate{};
 
-        private IState currentState;
-        private IState nextState;
+        private State currentState;
+        private State nextState;
         private bool containsVisualStates;
-        private readonly Dictionary<Type, IState> states = new Dictionary<Type, IState>();
+        private readonly Dictionary<Type, State> states = new Dictionary<Type, State>();
         
         public void Tick() {
             HandleStateTransition();
             currentState?.Tick();
         }
 
-        public void AddState(IState state) {
+        public void AddState(State state) {
             Type stateType = state.GetType();
+            state.StateMachine = this;
             
             if(states.ContainsKey(stateType)) {
                 Globals.Logger.LogError($"IState of type {stateType} already exists.");
@@ -29,10 +30,10 @@ namespace Footsies {
             states.Add(stateType, state);
         }
 
-        public T GetState<T>() where T : class, IState {
+        public T GetState<T>() where T : State {
             Type stateType = typeof(T);
 
-            if (states.TryGetValue(stateType, out IState existingState)) {
+            if (states.TryGetValue(stateType, out State existingState)) {
                 return existingState as T;
             }
 
@@ -41,10 +42,14 @@ namespace Footsies {
 
         }
 
-        public void SetState<T>() {
+        public void SetState<T>(bool immediate = true) {
             Type stateType = typeof(T);
             if(!states.TryGetValue(stateType, out nextState)) {
                 Globals.Logger.LogError($"Unable to transition to state {stateType}, state not found.");
+            }
+
+            if (immediate) {
+                HandleStateTransition();
             }
         }
 
@@ -61,8 +66,8 @@ namespace Footsies {
 
         private void FlushOnStateChangedStack() {
             while(onStateChangedStack.Count > 0) {
-                Action<IState> onStateChanged = onStateChangedStack[0].OnStateChanged;
-                IState stackState = onStateChangedStack[0].State;
+                Action<State> onStateChanged = onStateChangedStack[0].OnStateChanged;
+                State stackState = onStateChangedStack[0].State;
                 onStateChangedStack.RemoveAt(0);
                 onStateChanged(stackState);
             }
@@ -91,10 +96,10 @@ namespace Footsies {
         }
         
         private class StateChangedStackItem {
-            public readonly Action<IState> OnStateChanged;
-            public readonly IState State;
+            public readonly Action<State> OnStateChanged;
+            public readonly State State;
             
-            public StateChangedStackItem(Action<IState> onStateChanged, IState state) {
+            public StateChangedStackItem(Action<State> onStateChanged, State state) {
                 OnStateChanged = onStateChanged;
                 State = state;
             }

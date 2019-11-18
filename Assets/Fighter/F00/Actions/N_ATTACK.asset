@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -18,21 +19,21 @@ MonoBehaviour:
   isLoop: 0
   loopFromFrame: 0
   motions:
-  - startEndFrame: {x: 0, y: 1}
+  - StartEndFrame: {x: 0, y: 1}
     motionID: 50
-  - startEndFrame: {x: 2, y: 3}
+  - StartEndFrame: {x: 2, y: 3}
     motionID: 51
-  - startEndFrame: {x: 4, y: 15}
+  - StartEndFrame: {x: 4, y: 15}
     motionID: 52
-  - startEndFrame: {x: 16, y: 19}
+  - StartEndFrame: {x: 16, y: 19}
     motionID: 53
-  - startEndFrame: {x: 20, y: 21}
+  - StartEndFrame: {x: 20, y: 21}
     motionID: 54
   status:
-  - startEndFrame: {x: 0, y: 4}
+  - StartEndFrame: {x: 0, y: 4}
     counterHit: 1
   hitboxes:
-  - startEndFrame: {x: 0, y: 5}
+  - StartEndFrame: {x: 0, y: 5}
     rect:
       serializedVersion: 2
       x: 1.5
@@ -41,7 +42,7 @@ MonoBehaviour:
       height: 0.4
     attackID: 1
     proximity: 1
-  - startEndFrame: {x: 4, y: 5}
+  - StartEndFrame: {x: 4, y: 5}
     rect:
       serializedVersion: 2
       x: 0.9
@@ -51,7 +52,7 @@ MonoBehaviour:
     attackID: 1
     proximity: 0
   hurtboxes:
-  - startEndFrame: {x: 0, y: 21}
+  - StartEndFrame: {x: 0, y: 21}
     rect:
       serializedVersion: 2
       x: 0
@@ -59,7 +60,7 @@ MonoBehaviour:
       width: 1
       height: 1.2
     useBaseRect: 1
-  - startEndFrame: {x: 4, y: 15}
+  - StartEndFrame: {x: 4, y: 15}
     rect:
       serializedVersion: 2
       x: 0.8
@@ -67,7 +68,7 @@ MonoBehaviour:
       width: 1.6
       height: 0.4
     useBaseRect: 0
-  - startEndFrame: {x: 16, y: 18}
+  - StartEndFrame: {x: 16, y: 18}
     rect:
       serializedVersion: 2
       x: 0.5
@@ -76,7 +77,7 @@ MonoBehaviour:
       height: 0.4
     useBaseRect: 0
   pushboxes:
-  - startEndFrame: {x: 0, y: 21}
+  - StartEndFrame: {x: 0, y: 21}
     rect:
       serializedVersion: 2
       x: 0
@@ -86,11 +87,11 @@ MonoBehaviour:
     useBaseRect: 1
   movements: []
   cancels:
-  - startEndFrame: {x: 1, y: 3}
+  - StartEndFrame: {x: 1, y: 3}
     buffer: 1
     execute: 0
     actionID: 6e000000
-  - startEndFrame: {x: 4, y: 5}
+  - StartEndFrame: {x: 4, y: 5}
     buffer: 0
     execute: 1
     actionID: 6e000000

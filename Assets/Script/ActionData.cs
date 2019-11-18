@@ -75,7 +75,7 @@ namespace Footsies {
 
 		public MotionFrameData GetMotionData(int frame) {
 			foreach (MotionFrameData data in motions) {
-				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
+				if (data.StartEndFrame.x <= frame && frame <= data.StartEndFrame.y) {
 					return data;
 				}
 			}
@@ -85,7 +85,7 @@ namespace Footsies {
 
 		public StatusData GetStatusData(int frame) {
 			foreach (StatusData data in status) {
-				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
+				if (data.StartEndFrame.x <= frame && frame <= data.StartEndFrame.y) {
 					return data;
 				}
 			}
@@ -97,7 +97,7 @@ namespace Footsies {
 			List<HitboxData> hb = new List<HitboxData>();
 
 			foreach (HitboxData data in hitboxes) {
-				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
+				if (data.StartEndFrame.x <= frame && frame <= data.StartEndFrame.y) {
 					hb.Add(data);
 				}
 			}
@@ -109,7 +109,7 @@ namespace Footsies {
 			List<HurtboxData> hb = new List<HurtboxData>();
 
 			foreach (HurtboxData data in hurtboxes) {
-				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
+				if (data.StartEndFrame.x <= frame && frame <= data.StartEndFrame.y) {
 					hb.Add(data);
 				}
 			}
@@ -119,7 +119,7 @@ namespace Footsies {
 
 		public PushboxData GetPushboxData(int frame) {
 			foreach (PushboxData data in pushboxes) {
-				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
+				if (data.StartEndFrame.x <= frame && frame <= data.StartEndFrame.y) {
 					return data;
 				}
 			}
@@ -129,7 +129,7 @@ namespace Footsies {
 
 		public MovementData GetMovementData(int frame) {
 			foreach (MovementData data in movements) {
-				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
+				if (data.StartEndFrame.x <= frame && frame <= data.StartEndFrame.y) {
 					return data;
 				}
 			}
@@ -141,7 +141,7 @@ namespace Footsies {
 			List<CancelData> cd = new List<CancelData>();
 
 			foreach (CancelData data in cancels) {
-				if (frame >= data.StartEndFrame.x && frame <= data.StartEndFrame.y) {
+				if (data.StartEndFrame.x <= frame && frame <= data.StartEndFrame.y) {
 					cd.Add(data);
 				}
 			}
